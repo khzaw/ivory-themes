@@ -1,0 +1,18 @@
+;;; ivory-light-theme.el --- Light variant of Ivory theme -*- lexical-binding: t; -*-
+
+;;; Commentary:
+
+;; Light, near-monochromatic Ivory theme.
+
+;;; Code:
+
+(require 'ivory-themes)
+
+(deftheme ivory-light
+  "A minimal light monochromatic theme with restrained diff colors.")
+
+(ivory-theme-apply 'ivory-light 'light)
+
+(provide-theme 'ivory-light)
+
+;;; ivory-light-theme.el ends here
