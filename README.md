@@ -1,4 +1,4 @@
-# Ivory Theme
+# Ivory Themes
 
 Ivory is a minimal, near-monochromatic Emacs theme package with two variants:
 
@@ -8,17 +8,23 @@ Ivory is a minimal, near-monochromatic Emacs theme package with two variants:
 Most syntax contrast comes from weight, foreground intensity, and background
 surfaces.  Git and diff faces keep red/green directionality by default.
 
+## Naming
+
+The package, Lisp feature, and GitHub repository are `ivory-themes`, because
+the package ships more than one theme.  The theme names are `ivory-light` and
+`ivory-dark`.
+
 ## Installation
 
 ### `use-package` With `:vc`
 
 ```elisp
 (use-package ivory-themes
-  :vc (:url "https://github.com/khzaw/ivory-theme.git"
+  :vc (:url "https://github.com/khzaw/ivory-themes.git"
        :rev :newest)
   :custom
-  (ivory-theme-bold-constructs t)
-  (ivory-theme-italic-constructs nil)
+  (ivory-themes-bold-constructs t)
+  (ivory-themes-italic-constructs nil)
   :config
   (load-theme 'ivory-light t))
 ```
@@ -29,7 +35,7 @@ surfaces.  Git and diff faces keep red/green directionality by default.
 (unless (package-installed-p 'ivory-themes)
   (package-vc-install
    '(ivory-themes
-     :url "https://github.com/khzaw/ivory-theme.git"
+     :url "https://github.com/khzaw/ivory-themes.git"
      :branch "master")))
 
 (load-theme 'ivory-light t)
@@ -41,10 +47,10 @@ surfaces.  Git and diff faces keep red/green directionality by default.
 (use-package ivory-themes
   :straight (:type git
              :host github
-             :repo "khzaw/ivory-theme")
+             :repo "khzaw/ivory-themes")
   :custom
-  (ivory-theme-bold-constructs t)
-  (ivory-theme-italic-constructs nil)
+  (ivory-themes-bold-constructs t)
+  (ivory-themes-italic-constructs nil)
   :config
   (load-theme 'ivory-dark t))
 ```
@@ -54,10 +60,10 @@ surfaces.  Git and diff faces keep red/green directionality by default.
 ```elisp
 (use-package ivory-themes
   :elpaca (:host github
-           :repo "khzaw/ivory-theme")
+           :repo "khzaw/ivory-themes")
   :custom
-  (ivory-theme-bold-constructs t)
-  (ivory-theme-italic-constructs nil)
+  (ivory-themes-bold-constructs t)
+  (ivory-themes-italic-constructs nil)
   :config
   (load-theme 'ivory-light t))
 ```
@@ -74,8 +80,8 @@ Load a specific variant:
 Or use the helper commands:
 
 ```elisp
-(ivory-theme-load 'ivory-light)
-(ivory-theme-toggle)
+(ivory-themes-load 'ivory-light)
+(ivory-themes-toggle)
 ```
 
 ## Options
@@ -83,8 +89,8 @@ Or use the helper commands:
 Set options before loading or reloading a theme.
 
 ```elisp
-(setq ivory-theme-bold-constructs t
-      ivory-theme-italic-constructs nil)
+(setq ivory-themes-bold-constructs t
+      ivory-themes-italic-constructs nil)
 ```
 
 ## Palette Overrides
@@ -93,13 +99,13 @@ Diff colors are regular palette entries, so they can be tuned without editing
 the face definitions.
 
 ```elisp
-(setq ivory-theme-light-palette-overrides
+(setq ivory-themes-light-palette-overrides
       '((bg-added . "#d5f5df")
         (bg-removed . "#ffe0de")
         (fg-added . "#005a00")
         (fg-removed . "#990f0f")))
 ```
 
-Shared overrides go in `ivory-theme-common-palette-overrides`; variant-specific
-overrides go in `ivory-theme-light-palette-overrides` or
-`ivory-theme-dark-palette-overrides`.
+Shared overrides go in `ivory-themes-common-palette-overrides`; variant-specific
+overrides go in `ivory-themes-light-palette-overrides` or
+`ivory-themes-dark-palette-overrides`.
