@@ -96,7 +96,8 @@ Set options before loading or reloading a theme.
 ## Palette Overrides
 
 Diff colors are regular palette entries, so they can be tuned without editing
-the face definitions.
+the face definitions.  The active mode-line accent is also configurable through
+the `modeline-accent` palette entry.
 
 ```elisp
 (setq ivory-themes-light-palette-overrides

@@ -70,8 +70,9 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
         (bg-hl . "#eeeeee")
         (bg-region . "#d8d8d8")
         (bg-search . "#d0d0d0")
-        (bg-modeline . "#eeeeee")
+        (bg-modeline . "#e8e8e8")
         (bg-modeline-inactive . "#fafafa")
+        (modeline-accent . "#9c9c9c")
         (fg . "#111111")
         (fg-alt . "#404040")
         (fg-dim . "#777777")
@@ -107,8 +108,9 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
         (bg-hl . "#1a1a1a")
         (bg-region . "#3a3a3a")
         (bg-search . "#4a4a4a")
-        (bg-modeline . "#171717")
+        (bg-modeline . "#202020")
         (bg-modeline-inactive . "#070707")
+        (modeline-accent . "#777777")
         (fg . "#eeeeee")
         (fg-alt . "#c2c2c2")
         (fg-dim . "#666666")
@@ -139,8 +141,9 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
 (eval-and-compile
   (defconst ivory-themes--color-names
     '(bg bg-alt bg-dim bg-active bg-subtle bg-block bg-hl bg-region bg-search
-         bg-modeline bg-modeline-inactive fg fg-alt fg-dim fg-faint fg-inactive
-         border cursor red red-faint green green-faint yellow blue bg-added
+         bg-modeline bg-modeline-inactive modeline-accent
+         fg fg-alt fg-dim fg-faint fg-inactive border cursor
+         red red-faint green green-faint yellow blue bg-added
          bg-added-faint bg-removed bg-removed-faint bg-changed bg-changed-faint
          fg-added fg-added-intense fg-removed fg-removed-intense fg-changed
          fg-changed-intense)))
@@ -223,7 +226,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
        (ivory-themes--face 'whitespace-line `(:background ,bg-changed-faint :foreground ,fg-changed))
        (ivory-themes--face 'header-line `(:background ,bg-alt :foreground ,fg-alt :box (:line-width -1 :color ,border)))
        (ivory-themes--face 'header-line-highlight `(:background ,bg-active :foreground ,fg :weight bold))
-       (ivory-themes--face 'mode-line `(:background ,bg-modeline :foreground ,fg :box (:line-width -1 :color ,border)))
+       (ivory-themes--face 'mode-line `(:background ,bg-modeline :foreground ,fg :box (:line-width -1 :color ,modeline-accent)))
        (ivory-themes--face 'mode-line-inactive `(:background ,bg-modeline-inactive :foreground ,fg-inactive :box (:line-width -1 :color ,border)))
        (ivory-themes--face 'mode-line-buffer-id `(:foreground ,fg :weight bold))
        (ivory-themes--face 'mode-line-emphasis `(:foreground ,fg :weight bold))
@@ -725,7 +728,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
   "Return faces for modeline packages and auxiliary UI packages."
   (ivory-themes--with-colors palette
     (list
-     (ivory-themes--face 'doom-modeline-bar `(:background ,fg :foreground ,bg))
+     (ivory-themes--face 'doom-modeline-bar `(:background ,modeline-accent :foreground ,bg))
      (ivory-themes--face 'doom-modeline-bar-inactive `(:background ,fg-faint :foreground ,bg))
      (ivory-themes--face 'doom-modeline-buffer-file `(:foreground ,fg :weight bold))
      (ivory-themes--face 'doom-modeline-buffer-modified `(:foreground ,fg :weight bold))
