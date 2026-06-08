@@ -131,3 +131,7 @@ Or make diff backgrounds stronger:
 Shared overrides go in `ivory-themes-common-palette-overrides`; variant-specific
 overrides go in `ivory-themes-light-palette-overrides` or
 `ivory-themes-dark-palette-overrides`.
+
+## License
+
+Ivory Themes is licensed under the MIT License.  See [LICENSE](LICENSE).

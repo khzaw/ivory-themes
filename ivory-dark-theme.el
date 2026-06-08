@@ -1,5 +1,8 @@
 ;;; ivory-dark-theme.el --- Dark variant of Ivory theme -*- lexical-binding: t; -*-
 
+;; Copyright (C) 2026 Kaung Htet
+;; SPDX-License-Identifier: MIT
+
 ;;; Commentary:
 
 ;; Dark, near-monochromatic Ivory theme.

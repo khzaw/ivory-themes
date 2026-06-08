@@ -1,7 +1,8 @@
 ;;; ivory-themes.el --- Minimal monochromatic themes -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026 Kaung Htet
-
+;; SPDX-License-Identifier: MIT
+;;
 ;; Author: Kaung Htet
 ;; Maintainer: Kaung Htet
 ;; URL: https://github.com/khzaw/ivory-themes
