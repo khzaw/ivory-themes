@@ -257,7 +257,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
   (ivory-themes--with-colors palette
     (let ((bold (if ivory-themes-bold-constructs 'bold 'normal)))
       (list
-       (ivory-themes--face 'font-lock-builtin-face `(:foreground ,fg-syntax))
+       (ivory-themes--face 'font-lock-builtin-face `(:foreground ,fg-syntax :weight ,bold))
        (ivory-themes--face 'font-lock-comment-face `(:foreground ,fg-comment))
        (ivory-themes--face 'font-lock-comment-delimiter-face `(:foreground ,fg-comment-delimiter))
        (ivory-themes--face 'font-lock-constant-face `(:foreground ,fg-alt :weight ,bold))
