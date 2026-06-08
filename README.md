@@ -95,9 +95,9 @@ Set options before loading or reloading a theme.
 
 ## Palette Overrides
 
-Diff colors are regular palette entries, so they can be tuned without editing
-the face definitions.  The active mode-line accent is also configurable through
-the `modeline-accent` palette entry.
+Diff colors and comment colors are regular palette entries, so they can be
+tuned without editing the face definitions.  The active mode-line accent is
+also configurable through the `modeline-accent` palette entry.
 
 ```elisp
 (setq ivory-themes-light-palette-overrides
@@ -110,3 +110,5 @@ the `modeline-accent` palette entry.
 Shared overrides go in `ivory-themes-common-palette-overrides`; variant-specific
 overrides go in `ivory-themes-light-palette-overrides` or
 `ivory-themes-dark-palette-overrides`.
+
+For comment tuning, override `fg-comment` and `fg-comment-delimiter`.

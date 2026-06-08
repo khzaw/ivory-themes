@@ -77,6 +77,8 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
         (fg-alt . "#404040")
         (fg-dim . "#777777")
         (fg-faint . "#ababab")
+        (fg-comment . "#8c8c8c")
+        (fg-comment-delimiter . "#b8b8b8")
         (fg-inactive . "#8a8a8a")
         (border . "#dcdcdc")
         (cursor . "#000000")
@@ -115,6 +117,8 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
         (fg-alt . "#c2c2c2")
         (fg-dim . "#666666")
         (fg-faint . "#333333")
+        (fg-comment . "#666666")
+        (fg-comment-delimiter . "#333333")
         (fg-inactive . "#777777")
         (border . "#282828")
         (cursor . "#f2f2f2")
@@ -142,7 +146,8 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
   (defconst ivory-themes--color-names
     '(bg bg-alt bg-dim bg-active bg-subtle bg-block bg-hl bg-region bg-search
          bg-modeline bg-modeline-inactive modeline-accent
-         fg fg-alt fg-dim fg-faint fg-inactive border cursor
+         fg fg-alt fg-dim fg-faint fg-comment fg-comment-delimiter
+         fg-inactive border cursor
          red red-faint green green-faint yellow blue bg-added
          bg-added-faint bg-removed bg-removed-faint bg-changed bg-changed-faint
          fg-added fg-added-intense fg-removed fg-removed-intense fg-changed
@@ -248,10 +253,10 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
     (let ((bold (if ivory-themes-bold-constructs 'bold 'normal)))
       (list
        (ivory-themes--face 'font-lock-builtin-face `(:foreground ,fg :weight ,bold))
-       (ivory-themes--face 'font-lock-comment-face `(:foreground ,fg-dim))
-       (ivory-themes--face 'font-lock-comment-delimiter-face `(:foreground ,fg-faint))
+       (ivory-themes--face 'font-lock-comment-face `(:foreground ,fg-comment))
+       (ivory-themes--face 'font-lock-comment-delimiter-face `(:foreground ,fg-comment-delimiter))
        (ivory-themes--face 'font-lock-constant-face `(:foreground ,fg-alt :weight ,bold))
-       (ivory-themes--face 'font-lock-doc-face `(:foreground ,fg-dim))
+       (ivory-themes--face 'font-lock-doc-face `(:foreground ,fg-comment))
        (ivory-themes--face 'font-lock-doc-markup-face `(:foreground ,fg-alt :weight ,bold))
        (ivory-themes--face 'font-lock-function-name-face `(:foreground ,fg :weight ,bold))
        (ivory-themes--face 'font-lock-keyword-face `(:foreground ,fg :weight ,bold))
@@ -272,6 +277,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
        (ivory-themes--face 'font-lock-warning-face `(:inherit warning))
        (ivory-themes--face 'tree-sitter-hl-face:attribute `(:inherit font-lock-property-name-face))
        (ivory-themes--face 'tree-sitter-hl-face:constant `(:inherit font-lock-constant-face))
+       (ivory-themes--face 'tree-sitter-hl-face:comment `(:inherit font-lock-comment-face))
        (ivory-themes--face 'tree-sitter-hl-face:function `(:inherit font-lock-function-name-face))
        (ivory-themes--face 'tree-sitter-hl-face:function.call `(:foreground ,fg))
        (ivory-themes--face 'tree-sitter-hl-face:keyword `(:inherit font-lock-keyword-face))
