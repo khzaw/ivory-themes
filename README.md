@@ -95,20 +95,27 @@ Set options before loading or reloading a theme.
 
 ## Palette Overrides
 
-Diff colors and comment colors are regular palette entries, so they can be
-tuned without editing the face definitions.  The active mode-line accent is
-also configurable through the `modeline-accent` palette entry.
+Palette entries can be overridden from user configuration before loading or
+reloading a theme.  The override names are the same symbols used in
+`ivory-themes-palettes`, such as `fg`, `fg-comment`, `bg-modeline`,
+`modeline-accent`, `bg-added`, or `fg-removed`.
+
+For example, tune light comments:
+
+```elisp
+(setq ivory-themes-light-palette-overrides
+      '((fg-comment . "#969696")
+        (fg-comment-delimiter . "#c0c0c0")))
+```
+
+Or make diff backgrounds stronger:
 
 ```elisp
 (setq ivory-themes-light-palette-overrides
       '((bg-added . "#d5f5df")
-        (bg-removed . "#ffe0de")
-        (fg-added . "#005a00")
-        (fg-removed . "#990f0f")))
+        (bg-removed . "#ffe0de")))
 ```
 
 Shared overrides go in `ivory-themes-common-palette-overrides`; variant-specific
 overrides go in `ivory-themes-light-palette-overrides` or
 `ivory-themes-dark-palette-overrides`.
-
-For comment tuning, override `fg-comment` and `fg-comment-delimiter`.
