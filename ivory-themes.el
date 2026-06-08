@@ -264,7 +264,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
        (ivory-themes--face 'font-lock-doc-face `(:foreground ,fg-comment))
        (ivory-themes--face 'font-lock-doc-markup-face `(:foreground ,fg-alt :weight ,bold))
        (ivory-themes--face 'font-lock-function-name-face `(:foreground ,fg :weight ,bold))
-       (ivory-themes--face 'font-lock-keyword-face `(:foreground ,fg-syntax))
+       (ivory-themes--face 'font-lock-keyword-face `(:foreground ,fg-syntax :weight ,bold))
        (ivory-themes--face 'font-lock-negation-char-face `(:foreground ,fg-syntax))
        (ivory-themes--face 'font-lock-number-face `(:foreground ,fg-alt))
        (ivory-themes--face 'font-lock-operator-face `(:foreground ,fg-syntax))
