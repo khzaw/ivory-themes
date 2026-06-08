@@ -77,6 +77,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
         (fg-alt . "#404040")
         (fg-dim . "#777777")
         (fg-faint . "#ababab")
+        (fg-name . "#404040")
         (fg-comment . "#8c8c8c")
         (fg-comment-delimiter . "#b8b8b8")
         (fg-inactive . "#8a8a8a")
@@ -117,6 +118,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
         (fg-alt . "#c2c2c2")
         (fg-dim . "#666666")
         (fg-faint . "#333333")
+        (fg-name . "#9c9c9c")
         (fg-comment . "#666666")
         (fg-comment-delimiter . "#333333")
         (fg-inactive . "#777777")
@@ -146,7 +148,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
   (defconst ivory-themes--color-names
     '(bg bg-alt bg-dim bg-active bg-subtle bg-block bg-hl bg-region bg-search
          bg-modeline bg-modeline-inactive modeline-accent
-         fg fg-alt fg-dim fg-faint fg-comment fg-comment-delimiter
+         fg fg-alt fg-dim fg-faint fg-name fg-comment fg-comment-delimiter
          fg-inactive border cursor
          red red-faint green green-faint yellow blue bg-added
          bg-added-faint bg-removed bg-removed-faint bg-changed bg-changed-faint
@@ -265,16 +267,16 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
        (ivory-themes--face 'font-lock-number-face `(:foreground ,fg-alt))
        (ivory-themes--face 'font-lock-operator-face `(:foreground ,fg-alt :weight ,bold))
        (ivory-themes--face 'font-lock-preprocessor-face `(:foreground ,fg-alt :weight ,bold))
-       (ivory-themes--face 'font-lock-property-name-face `(:foreground ,fg-alt :weight normal))
-       (ivory-themes--face 'font-lock-property-use-face `(:foreground ,fg-alt))
+       (ivory-themes--face 'font-lock-property-name-face `(:foreground ,fg-name :weight normal))
+       (ivory-themes--face 'font-lock-property-use-face `(:foreground ,fg-name))
        (ivory-themes--face 'font-lock-punctuation-face `(:foreground ,fg-alt))
        (ivory-themes--face 'font-lock-regexp-face `(:foreground ,fg-alt :weight ,bold))
        (ivory-themes--face 'font-lock-regexp-grouping-backslash `(:foreground ,fg :weight ,bold))
        (ivory-themes--face 'font-lock-regexp-grouping-construct `(:foreground ,fg :weight ,bold))
        (ivory-themes--face 'font-lock-string-face `(:foreground ,fg-alt))
        (ivory-themes--face 'font-lock-type-face `(:foreground ,fg :weight ,bold))
-       (ivory-themes--face 'font-lock-variable-name-face `(:foreground ,fg-alt))
-       (ivory-themes--face 'font-lock-variable-use-face `(:foreground ,fg-alt))
+       (ivory-themes--face 'font-lock-variable-name-face `(:foreground ,fg-name))
+       (ivory-themes--face 'font-lock-variable-use-face `(:foreground ,fg-name))
        (ivory-themes--face 'font-lock-warning-face `(:inherit warning))
        (ivory-themes--face 'tree-sitter-hl-face:attribute `(:inherit font-lock-property-name-face))
        (ivory-themes--face 'tree-sitter-hl-face:constant `(:inherit font-lock-constant-face))

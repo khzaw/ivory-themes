@@ -98,7 +98,7 @@ Set options before loading or reloading a theme.
 Palette entries can be overridden from user configuration before loading or
 reloading a theme.  The override names are the same symbols used in
 `ivory-themes-palettes`, such as `fg`, `fg-comment`, `bg-modeline`,
-`modeline-accent`, `bg-added`, or `fg-removed`.
+`modeline-accent`, `fg-name`, `bg-added`, or `fg-removed`.
 
 For example, tune light comments:
 
