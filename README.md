@@ -93,6 +93,18 @@ Set options before loading or reloading a theme.
       ivory-themes-italic-constructs nil)
 ```
 
+## Palette System
+
+Ivory builds its monochrome colors from semantic roles over an 8-bit grayscale
+ladder.  In the source palette specs, `(gray 17)` resolves to `#111111`,
+`(gray 153)` resolves to `#999999`, and `(gray 255)` resolves to `#ffffff`.
+This keeps visual tuning deliberate: moving a role from `(gray 153)` to
+`(gray 166)` makes it one measured step lighter.
+
+The public override API remains semantic.  Configure roles such as
+`fg-comment`, `bg-block`, or `modeline-accent`; the internal grayscale notation
+is only there to keep the base palette systematic.
+
 ## Palette Overrides
 
 Palette entries can be overridden from user configuration before loading or
