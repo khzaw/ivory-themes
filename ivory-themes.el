@@ -86,7 +86,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
 (defconst ivory-themes-palette-specs
   '((light
      . ((bg . (gray 255))
-        (bg-alt . (gray 247))
+        (bg-alt . (gray 252))
         (bg-dim . (gray 240))
         (bg-active . (gray 230))
         (bg-subtle . (gray 251))
