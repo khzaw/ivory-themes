@@ -110,7 +110,8 @@ is only there to keep the base palette systematic.
 Palette entries can be overridden from user configuration before loading or
 reloading a theme.  The override names are the same symbols used in
 `ivory-themes-palettes`, such as `fg`, `fg-comment`, `bg-modeline`,
-`modeline-accent`, `fg-name`, `fg-syntax`, `bg-added`, or `fg-removed`.
+`modeline-accent`, `fg-name`, `fg-syntax`, `fg-string`, `bg-added`, or
+`fg-removed`.
 
 For example, tune light comments:
 

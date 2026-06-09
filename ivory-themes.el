@@ -104,6 +104,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
         (fg-faint . (gray 184))
         (fg-name . (gray 64))
         (fg-syntax . (gray 17))
+        (fg-string . (gray 96))
         (fg-comment . (gray 153))
         (fg-comment-delimiter . (gray 196))
         (fg-inactive . (gray 138))
@@ -146,6 +147,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
         (fg-faint . (gray 43))
         (fg-name . (gray 156))
         (fg-syntax . (gray 156))
+        (fg-string . (gray 194))
         (fg-comment . (gray 89))
         (fg-comment-delimiter . (gray 43))
         (fg-inactive . (gray 119))
@@ -183,8 +185,8 @@ remain explicit hex colors.")
   (defconst ivory-themes--color-names
     '(bg bg-alt bg-dim bg-active bg-subtle bg-block bg-hl bg-region bg-search
          bg-modeline bg-modeline-inactive modeline-accent
-         fg fg-alt fg-dim fg-faint fg-name fg-syntax fg-comment fg-comment-delimiter
-         fg-inactive border cursor
+         fg fg-alt fg-dim fg-faint fg-name fg-syntax fg-string
+         fg-comment fg-comment-delimiter fg-inactive border cursor
          red red-faint green green-faint yellow blue bg-added
          bg-added-faint bg-removed bg-removed-faint bg-changed bg-changed-faint
          fg-added fg-added-intense fg-removed fg-removed-intense fg-changed
@@ -297,7 +299,7 @@ remain explicit hex colors.")
        (ivory-themes--face 'font-lock-function-name-face `(:foreground ,fg :weight ,bold))
        (ivory-themes--face 'font-lock-keyword-face `(:foreground ,fg-syntax :weight ,bold))
        (ivory-themes--face 'font-lock-negation-char-face `(:foreground ,fg-syntax))
-       (ivory-themes--face 'font-lock-number-face `(:foreground ,fg-alt))
+       (ivory-themes--face 'font-lock-number-face `(:foreground ,fg-string))
        (ivory-themes--face 'font-lock-operator-face `(:foreground ,fg-syntax))
        (ivory-themes--face 'font-lock-preprocessor-face `(:foreground ,fg-syntax))
        (ivory-themes--face 'font-lock-property-name-face `(:foreground ,fg-name :weight normal))
@@ -306,7 +308,7 @@ remain explicit hex colors.")
        (ivory-themes--face 'font-lock-regexp-face `(:foreground ,fg-alt :weight ,bold))
        (ivory-themes--face 'font-lock-regexp-grouping-backslash `(:foreground ,fg :weight ,bold))
        (ivory-themes--face 'font-lock-regexp-grouping-construct `(:foreground ,fg :weight ,bold))
-       (ivory-themes--face 'font-lock-string-face `(:foreground ,fg-alt))
+       (ivory-themes--face 'font-lock-string-face `(:foreground ,fg-string))
        (ivory-themes--face 'font-lock-type-face `(:foreground ,fg :weight ,bold))
        (ivory-themes--face 'font-lock-variable-name-face `(:foreground ,fg-name))
        (ivory-themes--face 'font-lock-variable-use-face `(:foreground ,fg-name))
