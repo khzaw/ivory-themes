@@ -14,7 +14,7 @@
 (deftheme ivory-dark
   "A minimal dark monochromatic theme with restrained diff colors.")
 
-(ivory-themes-apply 'ivory-dark 'dark)
+(ivory-themes--apply 'ivory-dark 'dark)
 
 (provide-theme 'ivory-dark)
 

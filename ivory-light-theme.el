@@ -14,7 +14,7 @@
 (deftheme ivory-light
   "A minimal light monochromatic theme with restrained diff colors.")
 
-(ivory-themes-apply 'ivory-light 'light)
+(ivory-themes--apply 'ivory-light 'light)
 
 (provide-theme 'ivory-light)
 
