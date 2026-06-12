@@ -18,9 +18,6 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'subr-x))
-
 (defgroup ivory-themes nil
   "User options for the Ivory themes."
   :group 'faces
@@ -34,6 +31,15 @@
 
 (defcustom ivory-themes-italic-constructs nil
   "When non-nil, allow italic text in faces that conventionally use it."
+  :type 'boolean
+  :group 'ivory-themes)
+
+(defcustom ivory-themes-soft-backgrounds nil
+  "When non-nil, avoid pure white and pure black editor backgrounds.
+
+The default is nil, so `ivory-light' uses pure white and `ivory-dark'
+uses pure black.  Set this before loading or reloading a theme to use a
+slightly softened background instead."
   :type 'boolean
   :group 'ivory-themes)
 
@@ -84,113 +90,175 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
             (cons (car entry) (ivory-themes--resolve-palette-spec (cdr entry))))
           specs))
 
-(defconst ivory-themes-palette-specs
-  '((light
-     . ((bg . (gray 255))
-        (bg-alt . (gray 252))
-        (bg-dim . (gray 240))
-        (bg-active . (gray 230))
-        (bg-subtle . (gray 251))
-        (bg-block . (gray 243))
-        (bg-hl . (gray 238))
-        (bg-region . (gray 216))
-        (bg-search . (gray 208))
-        (bg-modeline . (gray 226))
-        (bg-modeline-inactive . (gray 250))
-        (modeline-accent . (gray 138))
-        (fg . (gray 17))
-        (fg-alt . (gray 64))
-        (fg-dim . (gray 133))
-        (fg-faint . (gray 184))
-        (fg-name . (gray 64))
-        (fg-syntax . (gray 17))
-        (fg-string . (gray 96))
-        (fg-comment . (gray 153))
-        (fg-comment-delimiter . (gray 196))
-        (fg-inactive . (gray 138))
-        (border . (gray 220))
-        (cursor . (gray 0))
-        (red . "#8f1313")
-        (red-faint . "#b54545")
-        (green . "#005000")
-        (green-faint . "#287a37")
-        (yellow . "#6f5700")
-        (blue . (gray 51))
-        (bg-added . "#c1f2d1")
-        (bg-added-faint . "#d8f8e1")
-        (bg-removed . "#ffd8d5")
-        (bg-removed-faint . "#ffe9e9")
-        (bg-changed . "#f5edcf")
-        (bg-changed-faint . "#faf5df")
-        (fg-added . "#005000")
-        (fg-added-intense . "#006700")
-        (fg-removed . "#8f1313")
-        (fg-removed-intense . "#aa2222")
-        (fg-changed . "#6f5700")
-        (fg-changed-intense . "#806400")))
-    (dark
-     . ((bg . (gray 0))
-        (bg-alt . (gray 6))
-        (bg-dim . (gray 17))
-        (bg-active . (gray 45))
-        (bg-subtle . (gray 5))
-        (bg-block . (gray 18))
-        (bg-hl . (gray 26))
-        (bg-region . (gray 58))
-        (bg-search . (gray 74))
-        (bg-modeline . (gray 48))
-        (bg-modeline-inactive . (gray 7))
-        (modeline-accent . (gray 176))
-        (fg . (gray 238))
-        (fg-alt . (gray 194))
-        (fg-dim . (gray 89))
-        (fg-faint . (gray 43))
-        (fg-name . (gray 156))
-        (fg-syntax . (gray 156))
-        (fg-string . (gray 194))
-        (fg-comment . (gray 89))
-        (fg-comment-delimiter . (gray 43))
-        (fg-inactive . (gray 119))
-        (border . (gray 40))
-        (cursor . (gray 242))
-        (red . "#ff5f5f")
-        (red-faint . "#ff8c8c")
-        (green . "#8bd48b")
-        (green-faint . "#66aa66")
-        (yellow . "#e0c45a")
-        (blue . (gray 216))
-        (bg-added . "#00381f")
-        (bg-added-faint . "#002910")
-        (bg-removed . "#4f1119")
-        (bg-removed-faint . "#380a0f")
-        (bg-changed . "#373012")
-        (bg-changed-faint . "#24200c")
-        (fg-added . "#a0e0a0")
-        (fg-added-intense . "#80e080")
-        (fg-removed . "#ff9c9c")
-        (fg-removed-intense . "#ff6f75")
-        (fg-changed . "#e0d090")
-        (fg-changed-intense . "#f0da80"))))
-  "Semantic palette specs for the Ivory themes.
+(eval-and-compile
+  (defconst ivory-themes-palette-specs
+    '((light
+       . ((bg . (gray 255))
+          (bg-alt . (gray 247))
+          (bg-dim . (gray 240))
+          (bg-active . (gray 230))
+          (bg-subtle . (gray 246))
+          (bg-block . (gray 243))
+          (bg-hl . (gray 238))
+          (bg-region . (gray 216))
+          (bg-search . (gray 208))
+          (bg-modeline . (gray 226))
+          (bg-modeline-inactive . (gray 245))
+          (modeline-accent . (gray 138))
+          (fg . (gray 17))
+          (fg-alt . (gray 64))
+          (fg-dim . (gray 133))
+          (fg-faint . (gray 146))
+          (fg-name . (gray 64))
+          (fg-syntax . (gray 17))
+          (fg-string . (gray 96))
+          (fg-comment . (gray 138))
+          (fg-comment-delimiter . (gray 146))
+          (fg-inactive . (gray 138))
+          (border . (gray 220))
+          (cursor . (gray 0))
+          (red . "#8f1313")
+          (red-faint . "#b54545")
+          (green . "#005000")
+          (green-faint . "#287a37")
+          (yellow . "#6f5700")
+          (blue . (gray 51))
+          (bg-added . "#c1f2d1")
+          (bg-added-faint . "#d8f8e1")
+          (bg-removed . "#ffd8d5")
+          (bg-removed-faint . "#ffe9e9")
+          (bg-changed . "#f5edcf")
+          (bg-changed-faint . "#faf5df")
+          (fg-added . "#005000")
+          (fg-added-intense . "#006700")
+          (fg-removed . "#8f1313")
+          (fg-removed-intense . "#aa2222")
+          (fg-changed . "#6f5700")
+          (fg-changed-intense . "#806400")))
+      (dark
+       . ((bg . (gray 0))
+          (bg-alt . (gray 13))
+          (bg-dim . (gray 17))
+          (bg-active . (gray 45))
+          (bg-subtle . (gray 12))
+          (bg-block . (gray 18))
+          (bg-hl . (gray 26))
+          (bg-region . (gray 58))
+          (bg-search . (gray 74))
+          (bg-modeline . (gray 48))
+          (bg-modeline-inactive . (gray 14))
+          (modeline-accent . (gray 176))
+          (fg . (gray 238))
+          (fg-alt . (gray 194))
+          (fg-dim . (gray 96))
+          (fg-faint . (gray 92))
+          (fg-name . (gray 156))
+          (fg-syntax . (gray 156))
+          (fg-string . (gray 194))
+          (fg-comment . (gray 96))
+          (fg-comment-delimiter . (gray 92))
+          (fg-inactive . (gray 119))
+          (border . (gray 40))
+          (cursor . (gray 242))
+          (red . "#ff5f5f")
+          (red-faint . "#ff8c8c")
+          (green . "#8bd48b")
+          (green-faint . "#66aa66")
+          (yellow . "#e0c45a")
+          (blue . (gray 216))
+          (bg-added . "#00381f")
+          (bg-added-faint . "#002910")
+          (bg-removed . "#4f1119")
+          (bg-removed-faint . "#380a0f")
+          (bg-changed . "#373012")
+          (bg-changed-faint . "#24200c")
+          (fg-added . "#a0e0a0")
+          (fg-added-intense . "#80e080")
+          (fg-removed . "#ff9c9c")
+          (fg-removed-intense . "#ff6f75")
+          (fg-changed . "#e0d090")
+          (fg-changed-intense . "#f0da80"))))
+    "Semantic palette specs for the Ivory themes.
 
 Grayscale entries use `(gray CHANNEL)', where CHANNEL is an 8-bit value
 from 0 through 255.  Non-monochrome accents, primarily diagnostics and diffs,
-remain explicit hex colors.")
+remain explicit hex colors."))
+
+(eval-and-compile
+  (defun ivory-themes--palette-spec-keys (variant)
+    "Return palette role names for VARIANT."
+    (mapcar #'car
+            (cdr (or (assq variant ivory-themes-palette-specs)
+                     (user-error "Unknown Ivory theme variant `%s'" variant)))))
+
+  (defun ivory-themes--duplicate-symbols (symbols)
+    "Return duplicated entries from SYMBOLS."
+    (let (seen duplicates)
+      (dolist (symbol symbols)
+        (if (memq symbol seen)
+            (push symbol duplicates)
+          (push symbol seen)))
+      (nreverse duplicates)))
+
+  (defconst ivory-themes--color-names
+    (ivory-themes--palette-spec-keys 'light)
+    "Canonical semantic color roles for the Ivory palettes."))
+
+(defun ivory-themes--validate-palette-specs ()
+  "Validate palette role consistency across theme variants."
+  (let ((expected ivory-themes--color-names))
+    (dolist (entry ivory-themes-palette-specs)
+      (let* ((variant (car entry))
+             (keys (mapcar #'car (cdr entry)))
+             (duplicates (ivory-themes--duplicate-symbols keys)))
+        (when duplicates
+          (user-error "Ivory `%s' palette has duplicate roles: %s"
+                      variant (mapconcat #'symbol-name duplicates ", ")))
+        (unless (equal keys expected)
+          (user-error "Ivory `%s' palette roles differ from `light'" variant))))))
+
+(ivory-themes--validate-palette-specs)
 
 (defconst ivory-themes-palettes
   (ivory-themes--resolve-palette-specs ivory-themes-palette-specs)
   "Resolved base palettes for the Ivory themes.")
 
-(eval-and-compile
-  (defconst ivory-themes--color-names
-    '(bg bg-alt bg-dim bg-active bg-subtle bg-block bg-hl bg-region bg-search
-         bg-modeline bg-modeline-inactive modeline-accent
-         fg fg-alt fg-dim fg-faint fg-name fg-syntax fg-string
-         fg-comment fg-comment-delimiter fg-inactive border cursor
-         red red-faint green green-faint yellow blue bg-added
-         bg-added-faint bg-removed bg-removed-faint bg-changed bg-changed-faint
-         fg-added fg-added-intense fg-removed fg-removed-intense fg-changed
-         fg-changed-intense)))
+(defconst ivory-themes--hex-color-regexp
+  "\\`#[[:xdigit:]]\\{6\\}\\'"
+  "Regular expression matching hex colors accepted by palette overrides.")
+
+(defun ivory-themes--hex-color-p (value)
+  "Return non-nil when VALUE is a six-digit hex color."
+  (and (stringp value)
+       (string-match-p ivory-themes--hex-color-regexp value)))
+
+(defun ivory-themes--validate-palette-overrides (overrides source)
+  "Validate palette OVERRIDES from SOURCE."
+  (dolist (entry overrides)
+    (unless (and (consp entry) (symbolp (car entry)))
+      (user-error "Ivory %s contains an invalid palette override entry: %S"
+                  source entry))
+    (unless (memq (car entry) ivory-themes--color-names)
+      (user-error "Ivory %s contains an unknown palette role `%s'"
+                  source (car entry)))
+    (unless (ivory-themes--hex-color-p (cdr entry))
+      (user-error "Ivory %s override `%s' must be a #rrggbb hex color"
+                  source (car entry))))
+  overrides)
+
+(defun ivory-themes--soft-background-overrides (variant)
+  "Return optional softened background overrides for VARIANT."
+  (when ivory-themes-soft-backgrounds
+    (pcase variant
+      ('light '((bg . "#f8f8f8")
+                 (bg-alt . "#f2f2f2")
+                 (bg-subtle . "#f1f1f1")
+                 (bg-modeline-inactive . "#f0f0f0")))
+      ('dark '((bg . "#080808")
+                (bg-alt . "#121212")
+                (bg-subtle . "#111111")
+                (bg-modeline-inactive . "#131313")))
+      (_ nil))))
 
 (defun ivory-themes--alist-get (key alist)
   "Return KEY from ALIST, or signal a user-facing error."
@@ -203,10 +271,16 @@ remain explicit hex colors.")
                    (user-error "Unknown Ivory theme variant `%s'" variant)))
          (variant-overrides
           (pcase variant
-            ('light ivory-themes-light-palette-overrides)
-            ('dark ivory-themes-dark-palette-overrides)
+            ('light (ivory-themes--validate-palette-overrides
+                     ivory-themes-light-palette-overrides "light palette"))
+            ('dark (ivory-themes--validate-palette-overrides
+                    ivory-themes-dark-palette-overrides "dark palette"))
             (_ nil))))
-    (append variant-overrides ivory-themes-common-palette-overrides base)))
+    (append variant-overrides
+            (ivory-themes--validate-palette-overrides
+             ivory-themes-common-palette-overrides "common palette")
+            (ivory-themes--soft-background-overrides variant)
+            base)))
 
 (defmacro ivory-themes--with-colors (palette &rest body)
   "Bind colors from PALETTE around BODY."
@@ -229,6 +303,7 @@ remain explicit hex colors.")
        (ivory-themes--face 'default `(:background ,bg :foreground ,fg))
        (ivory-themes--face 'cursor `(:background ,cursor))
        (ivory-themes--face 'fringe `(:background ,bg :foreground ,fg-faint))
+       (ivory-themes--face 'internal-border `(:background ,bg))
        (ivory-themes--face 'highlight `(:background ,bg-hl :foreground ,fg))
        (ivory-themes--face 'hl-line `(:background ,bg-subtle :extend t))
        (ivory-themes--face 'region `(:background ,bg-region :foreground ,fg :extend t))
@@ -313,6 +388,8 @@ remain explicit hex colors.")
        (ivory-themes--face 'font-lock-variable-name-face `(:foreground ,fg-name))
        (ivory-themes--face 'font-lock-variable-use-face `(:foreground ,fg-name))
        (ivory-themes--face 'font-lock-warning-face `(:inherit warning))
+       (ivory-themes--face 'sh-heredoc `(:background ,bg-block :foreground ,fg-string :extend t))
+       (ivory-themes--face 'sh-quoted-exec `(:foreground ,fg-syntax :weight ,bold))
        (ivory-themes--face 'tree-sitter-hl-face:attribute `(:inherit font-lock-property-name-face))
        (ivory-themes--face 'tree-sitter-hl-face:constant `(:inherit font-lock-constant-face))
        (ivory-themes--face 'tree-sitter-hl-face:comment `(:inherit font-lock-comment-face))
@@ -714,16 +791,36 @@ remain explicit hex colors.")
        (ivory-themes--face 'dired-mark `(:foreground ,fg :weight bold))
        (ivory-themes--face 'dired-marked `(:background ,bg-active :foreground ,fg :weight bold))
        (ivory-themes--face 'dired-perm-write `(:foreground ,fg-alt))
+       (ivory-themes--face 'dired-set-id `(:foreground ,fg-alt :weight ,bold))
+       (ivory-themes--face 'dired-special `(:foreground ,fg-alt :weight ,bold))
        (ivory-themes--face 'dired-symlink `(:foreground ,fg-alt :weight ,bold))
+       (ivory-themes--face 'dired-broken-symlink `(:foreground ,red :weight bold))
        (ivory-themes--face 'dired-warning `(:inherit warning))
+       (ivory-themes--face 'diredfl-autofile-name `(:foreground ,fg-alt))
+       (ivory-themes--face 'diredfl-compressed-file-name `(:foreground ,fg-alt))
+       (ivory-themes--face 'diredfl-compressed-file-suffix `(:foreground ,fg-dim))
+       (ivory-themes--face 'diredfl-date-time `(:foreground ,fg-dim))
+       (ivory-themes--face 'diredfl-deletion `(:background ,bg-removed :foreground ,fg-removed :weight bold))
+       (ivory-themes--face 'diredfl-deletion-file-name `(:foreground ,fg-removed :strike-through t))
+       (ivory-themes--face 'diredfl-dir-heading `(:foreground ,fg :weight bold))
        (ivory-themes--face 'diredfl-dir-name `(:inherit dired-directory))
+       (ivory-themes--face 'diredfl-dir-priv `(:foreground ,fg-alt :weight ,bold))
+       (ivory-themes--face 'diredfl-exec-priv `(:foreground ,fg-alt))
+       (ivory-themes--face 'diredfl-executable-tag `(:foreground ,fg-alt :weight ,bold))
        (ivory-themes--face 'diredfl-file-name `(:foreground ,fg))
        (ivory-themes--face 'diredfl-file-suffix `(:foreground ,fg-dim))
+       (ivory-themes--face 'diredfl-flag-mark `(:background ,bg-active :foreground ,fg :weight bold))
+       (ivory-themes--face 'diredfl-flag-mark-line `(:background ,bg-active :foreground ,fg :extend t))
+       (ivory-themes--face 'diredfl-ignored-file-name `(:foreground ,fg-faint))
        (ivory-themes--face 'diredfl-link-priv `(:foreground ,fg-alt))
        (ivory-themes--face 'diredfl-no-priv `(:foreground ,fg-faint))
        (ivory-themes--face 'diredfl-number `(:foreground ,fg-dim))
+       (ivory-themes--face 'diredfl-other-priv `(:foreground ,fg-alt))
+       (ivory-themes--face 'diredfl-rare-priv `(:foreground ,fg-alt :weight ,bold))
        (ivory-themes--face 'diredfl-read-priv `(:foreground ,fg-alt))
        (ivory-themes--face 'diredfl-symlink `(:inherit dired-symlink))
+       (ivory-themes--face 'diredfl-tagged-autofile-name `(:foreground ,fg-alt))
+       (ivory-themes--face 'diredfl-write-priv `(:foreground ,fg-alt))
        (ivory-themes--face 'dirvish-hl-line `(:inherit hl-line))
        (ivory-themes--face 'dirvish-file-time `(:foreground ,fg-dim))
        (ivory-themes--face 'dirvish-file-size `(:foreground ,fg-dim))
@@ -759,7 +856,7 @@ remain explicit hex colors.")
        (ivory-themes--face 'vterm-color-red `(:background ,red :foreground ,red))
        (ivory-themes--face 'vterm-color-green `(:background ,green :foreground ,green))
        (ivory-themes--face 'vterm-color-yellow `(:background ,yellow :foreground ,yellow))
-       (ivory-themes--face 'vterm-color-blue `(:background ,fg-dim :foreground ,fg-dim))
+       (ivory-themes--face 'vterm-color-blue `(:background ,blue :foreground ,blue))
        (ivory-themes--face 'vterm-color-magenta `(:background ,fg-alt :foreground ,fg-alt))
        (ivory-themes--face 'vterm-color-cyan `(:background ,fg-alt :foreground ,fg-alt))
        (ivory-themes--face 'vterm-color-white `(:background ,fg :foreground ,fg))
@@ -767,13 +864,13 @@ remain explicit hex colors.")
        (ivory-themes--face 'ansi-color-red `(:background ,red :foreground ,red))
        (ivory-themes--face 'ansi-color-green `(:background ,green :foreground ,green))
        (ivory-themes--face 'ansi-color-yellow `(:background ,yellow :foreground ,yellow))
-       (ivory-themes--face 'ansi-color-blue `(:background ,fg-dim :foreground ,fg-dim))
+       (ivory-themes--face 'ansi-color-blue `(:background ,blue :foreground ,blue))
        (ivory-themes--face 'ansi-color-magenta `(:background ,fg-alt :foreground ,fg-alt))
        (ivory-themes--face 'ansi-color-cyan `(:background ,fg-alt :foreground ,fg-alt))
        (ivory-themes--face 'ansi-color-white `(:background ,fg :foreground ,fg))))))
 
 (defun ivory-themes--faces-modelines-extra (palette)
-  "Return faces for modeline packages and auxiliary UI packages."
+  "Return modeline and auxiliary UI package faces for PALETTE."
   (ivory-themes--with-colors palette
     (list
      (ivory-themes--face 'doom-modeline-bar `(:background ,modeline-accent :foreground ,bg))
@@ -797,8 +894,15 @@ remain explicit hex colors.")
      (ivory-themes--face 'telephone-line-accent-active `(:background ,bg-active :foreground ,fg))
      (ivory-themes--face 'telephone-line-accent-inactive `(:background ,bg-modeline-inactive :foreground ,fg-inactive))
      (ivory-themes--face 'telephone-line-projectile `(:foreground ,fg :weight bold))
-     (ivory-themes--face 'solaire-default-face `(:background ,bg-alt :foreground ,fg))
+     (ivory-themes--face 'solaire-default-face `(:background ,bg :foreground ,fg))
+     (ivory-themes--face 'solaire-fringe-face `(:background ,bg :foreground ,fg-faint))
+     (ivory-themes--face 'solaire-line-number-face `(:background ,bg :foreground ,fg-faint))
+     (ivory-themes--face 'solaire-hl-line-face `(:background ,bg-subtle :extend t))
+     (ivory-themes--face 'solaire-region-face `(:background ,bg-region :foreground ,fg :extend t))
+     (ivory-themes--face 'solaire-org-hide-face `(:background ,bg :foreground ,bg))
+     (ivory-themes--face 'solaire-header-line-face `(:inherit header-line :background ,bg-alt))
      (ivory-themes--face 'solaire-mode-line-face `(:inherit mode-line :background ,bg-modeline))
+     (ivory-themes--face 'solaire-mode-line-active-face `(:inherit mode-line-active :background ,bg-modeline))
      (ivory-themes--face 'solaire-mode-line-inactive-face `(:inherit mode-line-inactive :background ,bg-modeline-inactive)))))
 
 (defun ivory-themes--faces-misc (palette)
@@ -897,9 +1001,23 @@ remain explicit hex colors.")
   "Return theme variable specs for PALETTE."
   (ivory-themes--with-colors palette
     `((ansi-color-names-vector
-       [,bg ,red ,green ,yellow ,fg-dim ,fg-alt ,fg-alt ,fg])
+       [,bg ,red ,green ,yellow ,blue ,fg-alt ,fg-alt ,fg])
       (fci-rule-color ,border)
       (pdf-view-midnight-colors (,fg . ,bg)))))
+
+(defun ivory-themes--variant (theme)
+  "Return the palette variant for THEME."
+  (pcase theme
+    ('ivory-light 'light)
+    ('ivory-dark 'dark)
+    (_ (user-error "Unknown Ivory theme: %s" theme))))
+
+(defun ivory-themes--current-theme ()
+  "Return the currently enabled Ivory theme, or `ivory-light'."
+  (cond
+   ((memq 'ivory-dark custom-enabled-themes) 'ivory-dark)
+   ((memq 'ivory-light custom-enabled-themes) 'ivory-light)
+   (t 'ivory-light)))
 
 ;;;###autoload
 (defun ivory-themes-load (theme)
@@ -907,8 +1025,14 @@ remain explicit hex colors.")
   (interactive
    (list (intern (completing-read "Load Ivory theme: " '(ivory-light ivory-dark)
                                   nil t nil nil "ivory-light"))))
-  (mapc #'disable-theme custom-enabled-themes)
-  (load-theme theme t))
+  (dolist (enabled custom-enabled-themes)
+    (unless (eq enabled theme)
+      (disable-theme enabled)))
+  (if (memq theme custom-known-themes)
+      (progn
+        (enable-theme theme)
+        (ivory-themes--apply theme (ivory-themes--variant theme)))
+    (load-theme theme t)))
 
 ;;;###autoload
 (defun ivory-themes-toggle ()
@@ -920,7 +1044,15 @@ remain explicit hex colors.")
      'ivory-light)))
 
 ;;;###autoload
-(defun ivory-themes-apply (theme variant)
+(defun ivory-themes-toggle-soft-backgrounds ()
+  "Toggle softened backgrounds and reload the current Ivory theme."
+  (interactive)
+  (setq ivory-themes-soft-backgrounds (not ivory-themes-soft-backgrounds))
+  (ivory-themes-load (ivory-themes--current-theme))
+  (message "Ivory soft backgrounds %s"
+           (if ivory-themes-soft-backgrounds "enabled" "disabled")))
+
+(defun ivory-themes--apply (theme variant)
   "Apply THEME using the palette for VARIANT."
   (let ((palette (ivory-themes--palette variant)))
     (apply #'custom-theme-set-faces theme (ivory-themes--all-faces palette))
