@@ -33,6 +33,13 @@
     (/ (+ (max left-luminance right-luminance) 0.05)
        (+ (min left-luminance right-luminance) 0.05))))
 
+(defun ivory-themes-test--face-attributes (face faces)
+  "Return FACE attributes from FACES."
+  (let ((entry (assq face faces)))
+    (unless entry
+      (error "Missing face spec for %S" face))
+    (cadr (car (cadr entry)))))
+
 (ert-deftest ivory-themes-test-palette-roles-match ()
   "Theme variants expose the same semantic palette roles."
   (should-not
@@ -56,6 +63,95 @@
         (ivory-themes-light-palette-overrides '((bg . "#fafafa"))))
     (should (equal (alist-get 'bg (ivory-themes--palette 'light))
                    "#fafafa"))))
+
+(ert-deftest ivory-themes-test-internal-border-follows-base-background ()
+  "Internal frame padding uses the same background as the editor."
+  (let ((ivory-themes-soft-backgrounds t))
+    (dolist (variant '(light dark))
+      (let* ((palette (ivory-themes--palette variant))
+             (bg (alist-get 'bg palette))
+             (internal-border (assq 'internal-border
+                                    (ivory-themes--faces-basic palette))))
+        (should (equal internal-border
+                       `(internal-border ((t (:background ,bg))))))))))
+
+(ert-deftest ivory-themes-test-solaire-remapped-faces-follow-base-surface ()
+  "Solaire buffers should not reveal contrasting frame padding."
+  (let ((ivory-themes-soft-backgrounds t))
+    (dolist (variant '(light dark))
+      (let* ((palette (ivory-themes--palette variant))
+             (bg (alist-get 'bg palette))
+             (bg-subtle (alist-get 'bg-subtle palette))
+             (bg-region (alist-get 'bg-region palette))
+             (fg (alist-get 'fg palette))
+             (fg-faint (alist-get 'fg-faint palette))
+             (faces (ivory-themes--faces-modelines-extra palette)))
+        (should (equal (assq 'solaire-default-face faces)
+                       `(solaire-default-face ((t (:background ,bg :foreground ,fg))))))
+        (should (equal (assq 'solaire-fringe-face faces)
+                       `(solaire-fringe-face ((t (:background ,bg :foreground ,fg-faint))))))
+        (should (equal (assq 'solaire-line-number-face faces)
+                       `(solaire-line-number-face ((t (:background ,bg :foreground ,fg-faint))))))
+        (should (equal (assq 'solaire-hl-line-face faces)
+                       `(solaire-hl-line-face ((t (:background ,bg-subtle :extend t))))))
+        (should (equal (assq 'solaire-region-face faces)
+                       `(solaire-region-face ((t (:background ,bg-region :foreground ,fg :extend t))))))
+        (should (equal (assq 'solaire-org-hide-face faces)
+                       `(solaire-org-hide-face ((t (:background ,bg :foreground ,bg))))))))))
+
+(ert-deftest ivory-themes-test-dired-metadata-faces-avoid-backgrounds ()
+  "Dired metadata and privilege columns should not paint color blocks."
+  (dolist (variant '(light dark))
+    (let ((faces (ivory-themes--faces-files-buffers
+                  (ivory-themes--palette variant))))
+      (dolist (face '(dired-perm-write
+                      dired-set-id
+                      dired-special
+                      diredfl-autofile-name
+                      diredfl-compressed-file-name
+                      diredfl-compressed-file-suffix
+                      diredfl-date-time
+                      diredfl-dir-heading
+                      diredfl-dir-name
+                      diredfl-dir-priv
+                      diredfl-exec-priv
+                      diredfl-executable-tag
+                      diredfl-file-name
+                      diredfl-file-suffix
+                      diredfl-ignored-file-name
+                      diredfl-link-priv
+                      diredfl-no-priv
+                      diredfl-number
+                      diredfl-other-priv
+                      diredfl-rare-priv
+                      diredfl-read-priv
+                      diredfl-symlink
+                      diredfl-tagged-autofile-name
+                      diredfl-write-priv))
+        (should-not
+         (plist-member (ivory-themes-test--face-attributes face faces)
+                       :background))))))
+
+(ert-deftest ivory-themes-test-shell-faces-stay-distinct ()
+  "Shell-specific constructs keep separate monochrome roles."
+  (let ((ivory-themes-bold-constructs t))
+    (dolist (variant '(light dark))
+      (let* ((palette (ivory-themes--palette variant))
+             (faces (ivory-themes--faces-font-lock palette))
+             (heredoc (ivory-themes-test--face-attributes
+                       'sh-heredoc faces))
+             (quoted-exec (ivory-themes-test--face-attributes
+                           'sh-quoted-exec faces)))
+        (should (equal (plist-get heredoc :foreground)
+                       (alist-get 'fg-string palette)))
+        (should (equal (plist-get heredoc :background)
+                       (alist-get 'bg-block palette)))
+        (should (eq (plist-get heredoc :extend) t))
+        (should (equal (plist-get quoted-exec :foreground)
+                       (alist-get 'fg-syntax palette)))
+        (should-not (equal (plist-get quoted-exec :foreground)
+                           (alist-get 'fg-string palette)))
+        (should (eq (plist-get quoted-exec :weight) 'bold))))))
 
 (ert-deftest ivory-themes-test-adjacent-background-contrast ()
   "Adjacent editor surfaces keep subtle contrast from the base background."

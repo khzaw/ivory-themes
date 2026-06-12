@@ -127,6 +127,12 @@ near-endpoint backgrounds instead: `ivory-light` uses `#f8f8f8`, and
 (ivory-themes-load 'ivory-light)
 ```
 
+Toggle softened backgrounds without restarting Emacs:
+
+```elisp
+(ivory-themes-toggle-soft-backgrounds)
+```
+
 Readable foreground roles target at least a 3:1 contrast ratio against `bg`.
 Primary code text is much higher; the 3:1 floor is for secondary readable text
 such as comments, dimmed labels, completion annotations, and inactive UI text.
