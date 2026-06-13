@@ -8,60 +8,7 @@ Ivory is a minimal, near-monochromatic Emacs theme package with two variants:
 Most syntax contrast comes from weight, foreground intensity, and background
 surfaces.  Git and diff faces keep red/green directionality by default.
 
-## Screenshots
-
-### Light mode
-
-#### Markdown
-
-![Markdown](.github/screenshots/markdown-light.png)
-
-#### TypeScript
-
-![TypeScript](.github/screenshots/typescript-light.png)
-
-#### Rust
-
-![Rust](.github/screenshots/rust-light.png)
-
-### Dark mode
-
-#### Markdown
-
-![Markdown](.github/screenshots/markdown-dark.png)
-
-#### Go
-
-![Go](.github/screenshots/go-dark.png)
-
-#### Python
-
-![Python](.github/screenshots/python-dark.png)
-
-#### JavaScript
-
-![JavaScript](.github/screenshots/javascript-dark.png)
-
-#### Magit Status
-
-![Magit Status](.github/screenshots/magit-status-dark.png)
-
-#### Magit Log
-
-![Magit Log](.github/screenshots/magit-log-dark.png)
-
-#### Avy
-
-![Avy](.github/screenshots/avy-dark.png)
-
-## Naming
-
-The package, Lisp feature, and GitHub repository are `ivory-themes`, because
-the package ships more than one theme.  The theme names are `ivory-light` and
-`ivory-dark`.
-
 ## Installation
-
 ### `use-package` With `:vc`
 
 ```elisp
@@ -73,18 +20,6 @@ the package ships more than one theme.  The theme names are `ivory-light` and
   (ivory-themes-italic-constructs nil)
   :config
   (load-theme 'ivory-light t))
-```
-
-### `package-vc-install`
-
-```elisp
-(unless (package-installed-p 'ivory-themes)
-  (package-vc-install
-   '(ivory-themes
-     :url "https://github.com/khzaw/ivory-themes.git"
-     :branch "master")))
-
-(load-theme 'ivory-light t)
 ```
 
 ### Straight.el
@@ -114,74 +49,76 @@ the package ships more than one theme.  The theme names are `ivory-light` and
   (load-theme 'ivory-light t))
 ```
 
-## Usage
-
-Load a specific variant:
-
-```elisp
-(load-theme 'ivory-light t)
-(load-theme 'ivory-dark t)
-```
-
-When using a local clone directly, add the directory to both `load-path` and
-`custom-theme-load-path` before calling `load-theme`.
-
-```elisp
-(add-to-list 'load-path "/path/to/ivory-themes")
-(add-to-list 'custom-theme-load-path "/path/to/ivory-themes")
-(require 'ivory-themes)
-(load-theme 'ivory-light t)
-```
-
-Or use the helper commands:
-
-```elisp
-(ivory-themes-load 'ivory-light)
-(ivory-themes-toggle)
-```
-
 ## Options
 
 Set options before loading or reloading a theme.
 
 ```elisp
-(setq ivory-themes-bold-constructs t
-      ivory-themes-italic-constructs nil
-      ivory-themes-soft-backgrounds nil)
+(setq ivory-themes-bold-constructs t      ; bold weight for syntax/UI contrast
+      ivory-themes-italic-constructs nil  ; italics where conventional
+      ivory-themes-soft-backgrounds nil)  ; pure white/black editor backgrounds
 ```
 
-## Palette System
+| Option | Default | Effect |
+| --- | --- | --- |
+| `ivory-themes-bold-constructs` | `t` | Use bold weight to create syntax and UI contrast. |
+| `ivory-themes-italic-constructs` | `nil` | Allow italics in faces that conventionally use them. |
+| `ivory-themes-soft-backgrounds` | `nil` | Replace the pure white/black editor background with a slightly softened one. |
 
-Ivory builds its monochrome colors from semantic roles over an 8-bit grayscale
-ladder.  In the source palette specs, `(gray 17)` resolves to `#111111`,
-`(gray 138)` resolves to `#8a8a8a`, and `(gray 255)` resolves to `#ffffff`.
-This keeps visual tuning deliberate: moving a role from `(gray 138)` to
-`(gray 146)` makes it one measured step lighter.
+### Softened backgrounds
 
-The default editor backgrounds use the absolute endpoints: `ivory-light`
-anchors `bg` at `(gray 255)`, and `ivory-dark` anchors `bg` at `(gray 0)`.
-Adjacent background surfaces keep a small contrast separation from the base
-background, so `bg-alt`, `bg-subtle`, and inactive modelines stay visible while
-the editor still reads as white or black.
-
-Set `ivory-themes-soft-backgrounds` before loading or reloading a theme to use
-near-endpoint backgrounds instead: `ivory-light` uses `#f8f8f8`, and
-`ivory-dark` uses `#080808`.
+By default `ivory-light` uses pure white and `ivory-dark` uses pure black for
+the editor background.  Enable `ivory-themes-soft-backgrounds` to take the edge
+off that contrast — `ivory-light` shifts to `#f8f8f8` and `ivory-dark` to
+`#080808`, along with matching adjustments to adjacent surfaces.
 
 ```elisp
 (setq ivory-themes-soft-backgrounds t)
 (ivory-themes-load 'ivory-light)
 ```
 
-Toggle softened backgrounds without restarting Emacs:
+You can also flip it without restarting Emacs:
 
 ```elisp
 (ivory-themes-toggle-soft-backgrounds)
 ```
 
+## Toggling between light and dark
+
+```elisp
+(ivory-themes-toggle)
+```
+
+## Palette System
+
+Everything that makes Ivory feel cohesive comes from one idea: colors are
+defined by *semantic role* over a single 8-bit grayscale ladder, not picked
+ad hoc.  In the source palette specs, `(gray 17)` resolves to `#111111`,
+`(gray 138)` resolves to `#8a8a8a`, and `(gray 255)` resolves to `#ffffff`.
+This keeps visual tuning deliberate: moving a role from `(gray 138)` to
+`(gray 146)` makes it exactly one measured step lighter.
+
 Readable foreground roles target at least a 3:1 contrast ratio against `bg`.
-Primary code text is much higher; the 3:1 floor is for secondary readable text
-such as comments, dimmed labels, completion annotations, and inactive UI text.
+Primary code text sits well above that; the 3:1 floor is for secondary readable
+text such as comments, dimmed labels, completion annotations, and inactive UI
+text.  Working in role-and-step terms is what keeps the whole palette balanced
+when any one value changes.
+
+### Softened backgrounds
+
+The default editor backgrounds sit at the absolute endpoints of the ladder:
+`ivory-light` anchors `bg` at `(gray 255)` and `ivory-dark` anchors `bg` at
+`(gray 0)`.  Adjacent surfaces keep a small contrast separation from that base,
+so `bg-alt`, `bg-subtle`, and inactive modelines stay visible while the editor
+still reads as white or black.
+
+For a softened look, there are a couple of options available:
+
+- Enable `ivory-themes-soft-backgrounds` (see [Options](#options)) to pull `bg`
+  just off the endpoint — `#f8f8f8` for light, `#080808` for dark — with the
+  neighbouring surfaces moved to match.
+- Override individual background roles yourself (see
+  [Palette Overrides](#palette-overrides)) if you want a specific tone.
 
 The public override API remains semantic.  Configure roles such as
 `fg-comment`, `bg-block`, or `modeline-accent`; the internal grayscale notation
@@ -228,6 +165,52 @@ Or make diff backgrounds stronger:
 Shared overrides go in `ivory-themes-common-palette-overrides`; variant-specific
 overrides go in `ivory-themes-light-palette-overrides` or
 `ivory-themes-dark-palette-overrides`.
+
+## Screenshots
+### Light mode
+
+#### Markdown
+
+![Markdown](.github/screenshots/markdown-light.png)
+
+#### TypeScript
+
+![TypeScript](.github/screenshots/typescript-light.png)
+
+#### Rust
+
+![Rust](.github/screenshots/rust-light.png)
+
+### Dark mode
+
+#### Markdown
+
+![Markdown](.github/screenshots/markdown-dark.png)
+
+#### Go
+
+![Go](.github/screenshots/go-dark.png)
+
+#### Python
+
+![Python](.github/screenshots/python-dark.png)
+
+#### JavaScript
+
+![JavaScript](.github/screenshots/javascript-dark.png)
+
+#### Magit Status
+
+![Magit Status](.github/screenshots/magit-status-dark.png)
+
+#### Magit Log
+
+![Magit Log](.github/screenshots/magit-log-dark.png)
+
+#### Avy
+
+![Avy](.github/screenshots/avy-dark.png)
+
 
 ## License
 
