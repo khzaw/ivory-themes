@@ -1,2 +1,3 @@
 *.elc
 .field-notes/
+.DS_Store

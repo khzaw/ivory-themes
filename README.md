@@ -8,6 +8,52 @@ Ivory is a minimal, near-monochromatic Emacs theme package with two variants:
 Most syntax contrast comes from weight, foreground intensity, and background
 surfaces.  Git and diff faces keep red/green directionality by default.
 
+## Screenshots
+
+### Light mode
+
+#### Markdown
+
+![Markdown](.github/screenshots/markdown-light.png)
+
+#### TypeScript
+
+![TypeScript](.github/screenshots/typescript-light.png)
+
+#### Rust
+
+![Rust](.github/screenshots/rust-light.png)
+
+### Dark mode
+
+#### Markdown
+
+![Markdown](.github/screenshots/markdown-dark.png)
+
+#### Go
+
+![Go](.github/screenshots/go-dark.png)
+
+#### Python
+
+![Python](.github/screenshots/python-dark.png)
+
+#### JavaScript
+
+![JavaScript](.github/screenshots/javascript-dark.png)
+
+#### Magit Status
+
+![Magit Status](.github/screenshots/magit-status-dark.png)
+
+#### Magit Log
+
+![Magit Log](.github/screenshots/magit-log-dark.png)
+
+#### Avy
+
+![Avy](.github/screenshots/avy-dark.png)
+
 ## Naming
 
 The package, Lisp feature, and GitHub repository are `ivory-themes`, because
