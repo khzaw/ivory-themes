@@ -91,38 +91,48 @@ You can also flip it without restarting Emacs:
 
 ## Palette System
 
-Everything that makes Ivory feel cohesive comes from one idea: colors are
-defined by *semantic role* over a single 8-bit grayscale ladder, not picked
-ad hoc.  In the source palette specs, `(gray 17)` resolves to `#111111`,
-`(gray 138)` resolves to `#8a8a8a`, and `(gray 255)` resolves to `#ffffff`.
-This keeps visual tuning deliberate: moving a role from `(gray 138)` to
-`(gray 146)` makes it exactly one measured step lighter.
+Ivory is a near-monochromatic theme, so nearly every color is a shade of gray.
+The idea behind the grayscale is to describe each of those grays with a single
+number instead of a hex code.
 
-Readable foreground roles target at least a 3:1 contrast ratio against `bg`.
-Primary code text sits well above that; the 3:1 floor is for secondary readable
-text such as comments, dimmed labels, completion annotations, and inactive UI
-text.  Working in role-and-step terms is what keeps the whole palette balanced
-when any one value changes.
+A color has three channels: red, green, and blue. Each one goes from 0 to 255.
+When all three are equal, you get a gray, so one number is enough to define it.
+That number is the rung on the ladder. `(gray 0)` is black, `#000000`.
+`(gray 255)` is white, `#ffffff`. `(gray 138)` sits in the middle at `#8a8a8a`.
+
+So most colors are just a name pointing at one rung on the ladder. The palette
+source writes them as `(gray N)` instead of hex. To make a color lighter, you
+raise the number. `(gray 138)` to `(gray 146)` is one small step up.
+
+A few colors aren't gray, like the red and green diff faces. Those are written
+as plain hex.
+
+The readable foreground roles are kept at a contrast ratio of at least 3:1
+against the background.  Primary code text sits well above that floor.  The 3:1
+target is really there for the quieter text like comments, dimmed labels,
+completion annotations, and inactive UI text, so those stay legible without
+shouting.
 
 ### Softened backgrounds
 
-The default editor backgrounds sit at the absolute endpoints of the ladder:
-`ivory-light` anchors `bg` at `(gray 255)` and `ivory-dark` anchors `bg` at
-`(gray 0)`.  Adjacent surfaces keep a small contrast separation from that base,
-so `bg-alt`, `bg-subtle`, and inactive modelines stay visible while the editor
-still reads as white or black.
+By default the editor background sits right at the end of the ladder.
+`ivory-light` puts `bg` at `(gray 255)` and `ivory-dark` puts it at `(gray 0)`.
+The surfaces next to it keep a small gap from that base, so `bg-alt`,
+`bg-subtle`, and inactive modelines stay visible while the editor still reads
+as white or black.
 
-For a softened look, there are a couple of options available:
+If you'd rather not have a pure white or pure black background, you have two
+ways to soften it.
 
-- Enable `ivory-themes-soft-backgrounds` (see [Options](#options)) to pull `bg`
-  just off the endpoint — `#f8f8f8` for light, `#080808` for dark — with the
-  neighbouring surfaces moved to match.
-- Override individual background roles yourself (see
-  [Palette Overrides](#palette-overrides)) if you want a specific tone.
+- Turn on `ivory-themes-soft-backgrounds` (see [Options](#options)).  This
+  pulls `bg` just off the end of the ladder, to `#f8f8f8` for light and
+  `#080808` for dark, and moves the nearby surfaces to match.
+- Override the background roles yourself (see
+  [Palette Overrides](#palette-overrides)) if you want a particular tone.
 
-The public override API remains semantic.  Configure roles such as
-`fg-comment`, `bg-block`, or `modeline-accent`; the internal grayscale notation
-is only there to keep the base palette systematic.
+Either way you stay in the same role-based system.  You set roles like
+`fg-comment`, `bg-block`, or `modeline-accent`, and the grayscale notation
+behind the scenes just keeps the base palette consistent.
 
 Palette roles:
 
