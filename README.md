@@ -139,6 +139,7 @@ Palette roles:
 | Group | Roles |
 | --- | --- |
 | Backgrounds | `bg`, `bg-alt`, `bg-dim`, `bg-active`, `bg-subtle`, `bg-block`, `bg-hl`, `bg-region`, `bg-search`, `bg-modeline`, `bg-modeline-inactive` |
+| Code backgrounds | `bg-code-block`, `bg-code-inline` |
 | Foregrounds | `fg`, `fg-alt`, `fg-dim`, `fg-faint`, `fg-name`, `fg-syntax`, `fg-string`, `fg-comment`, `fg-comment-delimiter`, `fg-inactive` |
 | UI structure | `border`, `cursor`, `modeline-accent` |
 | Accents and ANSI roles | `red`, `red-faint`, `green`, `green-faint`, `yellow`, `blue` |

@@ -178,6 +178,21 @@
                    (alist-get 'bg dark) (alist-get role dark))
                   1.05)))))
 
+(ert-deftest ivory-themes-test-code-backgrounds-stand-away-from-editor ()
+  "Code surfaces stay visually distinct in pure and softened backgrounds."
+  (dolist (soft '(nil t))
+    (let ((ivory-themes-soft-backgrounds soft))
+      (dolist (variant '(light dark))
+        (let ((palette (ivory-themes--palette variant)))
+          (should (>= (ivory-themes-test--contrast-ratio
+                       (alist-get 'bg palette)
+                       (alist-get 'bg-code-block palette))
+                      1.08))
+          (should (>= (ivory-themes-test--contrast-ratio
+                       (alist-get 'bg palette)
+                       (alist-get 'bg-code-inline palette))
+                      1.12)))))))
+
 (ert-deftest ivory-themes-test-readable-text-contrast ()
   "Readable foreground roles keep a minimum contrast against the base bg."
   (dolist (variant '(light dark))
@@ -188,6 +203,104 @@
         (should (>= (ivory-themes-test--contrast-ratio
                      bg (alist-get role palette))
                     3.0))))))
+
+(ert-deftest ivory-themes-test-writing-code-faces-use-dedicated-surfaces ()
+  "Org and Markdown code faces use stronger code-specific surfaces."
+  (dolist (variant '(light dark))
+    (let* ((palette (ivory-themes--palette variant))
+           (faces (ivory-themes--faces-org-markdown palette))
+           (bg-code-block (alist-get 'bg-code-block palette))
+           (bg-code-inline (alist-get 'bg-code-inline palette))
+           (fg-alt (alist-get 'fg-alt palette)))
+      (dolist (face '(org-block markdown-code-face))
+        (should (equal (plist-get (ivory-themes-test--face-attributes face faces)
+                                  :background)
+                       bg-code-block)))
+      (dolist (face '(markdown-ts-code-block md-ts-code))
+        (should (eq (plist-get (ivory-themes-test--face-attributes face faces)
+                               :inherit)
+                    'markdown-code-face)))
+      (dolist (face '(org-code org-verbatim org-inline-src-block
+                      markdown-inline-code-face))
+        (let ((attributes (ivory-themes-test--face-attributes face faces)))
+          (should (equal (plist-get attributes :background) bg-code-inline))
+          (should (equal (plist-get attributes :foreground) fg-alt))
+          (should (equal (plist-get (plist-get attributes :box) :color)
+                         bg-code-inline))))
+      (dolist (face '(markdown-ts-code-span md-ts-inline-code))
+        (should (eq (plist-get (ivory-themes-test--face-attributes face faces)
+                               :inherit)
+                    'markdown-inline-code-face))))))
+
+(ert-deftest ivory-themes-test-forge-pull-request-states-stay-distinct ()
+  "Forge pull request states should be distinguishable without loud colors."
+  (dolist (variant '(light dark))
+    (let* ((palette (ivory-themes--palette variant))
+           (faces (ivory-themes--faces-vcs palette))
+           (open (ivory-themes-test--face-attributes
+                  'forge-pullreq-open faces))
+           (merged (ivory-themes-test--face-attributes
+                    'forge-pullreq-merged faces))
+           (rejected (ivory-themes-test--face-attributes
+                      'forge-pullreq-rejected faces))
+           (draft (ivory-themes-test--face-attributes
+                   'forge-pullreq-draft faces)))
+      (should (equal (plist-get open :foreground)
+                     (alist-get 'fg palette)))
+      (should (equal (plist-get merged :foreground)
+                     (alist-get 'border palette)))
+      (should (eq (plist-get merged :strike-through) t))
+      (should (eq (plist-get merged :weight) 'normal))
+      (should-not (plist-member merged :box))
+      (should (equal (plist-get rejected :foreground)
+                     (alist-get 'red-faint palette)))
+      (should (eq (plist-get rejected :strike-through) t))
+      (should (eq (plist-get rejected :weight) 'normal))
+      (should-not (plist-member open :underline))
+      (should-not (plist-member merged :underline))
+      (should-not (plist-member rejected :underline))
+      (should-not (plist-member draft :underline))
+      (should (equal (plist-get draft :background)
+                     (alist-get 'bg-block palette)))
+      (should-not (plist-member draft :foreground))
+      (should-not (equal (plist-get open :foreground)
+                         (plist-get merged :foreground)))
+      (should-not (equal (plist-get merged :foreground)
+                         (plist-get rejected :foreground))))))
+
+(ert-deftest ivory-themes-test-forge-status-faces-compose-with-states ()
+  "Forge notification status faces should not replace state colors."
+  (dolist (variant '(light dark))
+    (let* ((palette (ivory-themes--palette variant))
+           (faces (ivory-themes--faces-vcs palette))
+           (unread (ivory-themes-test--face-attributes
+                    'forge-topic-unread faces))
+           (pending (ivory-themes-test--face-attributes
+                     'forge-topic-pending faces))
+           (done (ivory-themes-test--face-attributes
+                  'forge-topic-done faces)))
+      (should-not (plist-member unread :foreground))
+      (should-not (plist-member pending :foreground))
+      (should-not (plist-member done :foreground))
+      (should-not (plist-member unread :weight))
+      (should-not (plist-member unread :box))
+      (should-not (plist-member pending :weight))
+      (should-not (plist-member pending :box))
+      (should-not (plist-member pending :underline)))))
+
+(ert-deftest ivory-themes-test-forge-labels-use-tag-chip-roles ()
+  "Forge labels should read as restrained chips, not selections."
+  (dolist (variant '(light dark))
+    (let* ((palette (ivory-themes--palette variant))
+           (faces (ivory-themes--faces-vcs palette))
+           (label (ivory-themes-test--face-attributes
+                   'forge-topic-label faces)))
+      (should (equal (plist-get label :background)
+                     (alist-get 'bg-active palette)))
+      (should (equal (plist-get label :foreground)
+                     (alist-get 'fg-alt palette)))
+      (should-not (equal (plist-get label :background)
+                         (alist-get 'bg-region palette))))))
 
 (ert-deftest ivory-themes-test-ansi-blue-uses-blue-role ()
   "ANSI color variables use the public `blue' palette role."
