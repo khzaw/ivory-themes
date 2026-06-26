@@ -232,6 +232,34 @@
                                :inherit)
                     'markdown-inline-code-face))))))
 
+(ert-deftest ivory-themes-test-magit-current-branch-stands-out ()
+  "The current branch should differ from local branches and neutral tags."
+  (dolist (variant '(light dark))
+    (let* ((palette (ivory-themes--palette variant))
+           (faces (ivory-themes--faces-vcs palette))
+           (current (ivory-themes-test--face-attributes
+                     'magit-branch-current faces))
+           (tag (ivory-themes-test--face-attributes
+                 'magit-tag faces))
+           (local (ivory-themes-test--face-attributes
+                   'magit-branch-local faces)))
+      (should (eq (plist-get current :weight) 'bold))
+      (should (eq (plist-get local :weight) 'bold))
+      (should (equal (plist-get current :background)
+                     (alist-get 'bg-branch-current palette)))
+      (should (equal (plist-get (plist-get current :box) :color)
+                     (alist-get 'branch-current-border palette)))
+      (should (equal (plist-get tag :background)
+                     (alist-get 'bg-active palette)))
+      (should (equal (plist-get (plist-get tag :box) :color)
+                     (alist-get 'border palette)))
+      (should-not (equal (plist-get current :background)
+                         (plist-get tag :background)))
+      (should-not (equal (plist-get (plist-get current :box) :color)
+                         (plist-get (plist-get tag :box) :color)))
+      (should-not (plist-member local :background))
+      (should-not (plist-member local :box)))))
+
 (ert-deftest ivory-themes-test-forge-pull-request-states-stay-distinct ()
   "Forge pull request states should be distinguishable without loud colors."
   (dolist (variant '(light dark))
