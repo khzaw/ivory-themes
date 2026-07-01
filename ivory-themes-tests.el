@@ -153,6 +153,42 @@
                            (alist-get 'fg-string palette)))
         (should (eq (plist-get quoted-exec :weight) 'bold))))))
 
+(ert-deftest ivory-themes-test-whitespace-tabs-stand-out-from-spaces ()
+  "Visible tabs should have a stronger cue than ordinary space markers."
+  (dolist (variant '(light dark))
+    (let* ((palette (ivory-themes--palette variant))
+           (faces (ivory-themes--faces-basic palette))
+           (space (ivory-themes-test--face-attributes
+                   'whitespace-space faces))
+           (tab (ivory-themes-test--face-attributes
+                 'whitespace-tab faces)))
+      (should (equal (plist-get space :foreground)
+                     (alist-get 'fg-faint palette)))
+      (should-not (plist-member space :background))
+      (should (equal (plist-get tab :background)
+                     (alist-get 'bg-block palette)))
+      (should (equal (plist-get tab :foreground)
+                     (alist-get 'fg-alt palette)))
+      (should (eq (plist-get tab :weight) 'bold))
+      (should-not (equal (plist-get tab :foreground)
+                         (plist-get space :foreground))))))
+
+(ert-deftest ivory-themes-test-makefile-space-avoids-hotpink-default ()
+  "Makefile whitespace warnings should use Ivory roles, not Emacs hotpink."
+  (dolist (variant '(light dark))
+    (let* ((palette (ivory-themes--palette variant))
+           (faces (ivory-themes--faces-font-lock palette))
+           (space (ivory-themes-test--face-attributes
+                   'makefile-space faces)))
+      (should (equal (plist-get space :background)
+                     (alist-get 'bg-block palette)))
+      (should (equal (plist-get space :foreground)
+                     (alist-get 'fg-removed palette)))
+      (should (equal (plist-get (plist-get space :underline) :color)
+                     (alist-get 'fg-removed palette)))
+      (should (eq (plist-get space :weight) 'bold))
+      (should-not (equal (plist-get space :background) "hotpink")))))
+
 (ert-deftest ivory-themes-test-adjacent-background-contrast ()
   "Adjacent editor surfaces keep subtle contrast from the base background."
   (let* ((light (alist-get 'light ivory-themes-palettes))
