@@ -40,6 +40,16 @@
       (error "Missing face spec for %S" face))
     (cadr (car (cadr entry)))))
 
+(defun ivory-themes-test--reset-light-theme ()
+  "Return `ivory-light' to a pristine, disabled state.
+`disable-theme' leaves stale entries in the theme's `theme-settings',
+so a later `custom-theme-set-faces' appends instead of replacing and
+an old face spec can win on re-enable.  Clearing `theme-settings'
+keeps integration tests independent of one another."
+  (when (memq 'ivory-light custom-enabled-themes)
+    (disable-theme 'ivory-light))
+  (put 'ivory-light 'theme-settings nil))
+
 (ert-deftest ivory-themes-test-palette-roles-match ()
   "Theme variants expose the same semantic palette roles."
   (should-not
@@ -388,6 +398,61 @@
    (ivory-themes--validate-palette-overrides
     '((fg-comment . "not-a-color")) "test")
    :type 'user-error))
+
+(ert-deftest ivory-themes-test-soft-background-toggle-affects-default-face ()
+  "Toggling soft backgrounds reloads with a softened default face.
+Regression test for the apply-then-enable order in `ivory-themes-load'."
+  (let ((theme-dir (file-name-directory (locate-library "ivory-themes")))
+        (old-soft ivory-themes-soft-backgrounds)
+        (old-light ivory-themes-light-palette-overrides)
+        (old-common ivory-themes-common-palette-overrides)
+        (old-ctlp custom-theme-load-path))
+    (unwind-protect
+        (progn
+          (setq ivory-themes-soft-backgrounds nil
+                ivory-themes-light-palette-overrides nil
+                ivory-themes-common-palette-overrides nil
+                custom-theme-load-path (list theme-dir))
+          (ivory-themes-test--reset-light-theme)
+          (ivory-themes-load 'ivory-light)
+          (should (equal (face-background 'default) "#ffffff"))
+          (ivory-themes-toggle-soft-backgrounds)
+          (should (equal (face-background 'default) "#f8f8f8")))
+      (setq ivory-themes-soft-backgrounds old-soft
+            ivory-themes-light-palette-overrides old-light
+            ivory-themes-common-palette-overrides old-common
+            custom-theme-load-path old-ctlp)
+      (ivory-themes-test--reset-light-theme)
+      (when (memq 'ivory-dark custom-enabled-themes)
+        (disable-theme 'ivory-dark)))))
+
+(ert-deftest ivory-themes-test-reload-applies-changed-palette-override ()
+  "Reloading an already-loaded theme picks up a changed override.
+Regression test for the apply-then-enable order in `ivory-themes-load'."
+  (let ((theme-dir (file-name-directory (locate-library "ivory-themes")))
+        (old-soft ivory-themes-soft-backgrounds)
+        (old-light ivory-themes-light-palette-overrides)
+        (old-common ivory-themes-common-palette-overrides)
+        (old-ctlp custom-theme-load-path))
+    (unwind-protect
+        (progn
+          (setq ivory-themes-soft-backgrounds nil
+                ivory-themes-common-palette-overrides nil
+                ivory-themes-light-palette-overrides '((bg . "#f0fff0"))
+                custom-theme-load-path (list theme-dir))
+          (ivory-themes-test--reset-light-theme)
+          (ivory-themes-load 'ivory-light)
+          (should (equal (face-background 'default) "#f0fff0"))
+          (setq ivory-themes-light-palette-overrides '((bg . "#fff0f0")))
+          (ivory-themes-load 'ivory-light)
+          (should (equal (face-background 'default) "#fff0f0")))
+      (setq ivory-themes-soft-backgrounds old-soft
+            ivory-themes-light-palette-overrides old-light
+            ivory-themes-common-palette-overrides old-common
+            custom-theme-load-path old-ctlp)
+      (ivory-themes-test--reset-light-theme)
+      (when (memq 'ivory-dark custom-enabled-themes)
+        (disable-theme 'ivory-dark)))))
 
 (provide 'ivory-themes-tests)
 

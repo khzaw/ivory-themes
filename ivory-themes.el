@@ -1080,8 +1080,8 @@ branch state, remain explicit hex colors."))
       (disable-theme enabled)))
   (if (memq theme custom-known-themes)
       (progn
-        (enable-theme theme)
-        (ivory-themes--apply theme (ivory-themes--variant theme)))
+        (ivory-themes--apply theme (ivory-themes--variant theme))
+        (enable-theme theme))
     (load-theme theme t)))
 
 ;;;###autoload
