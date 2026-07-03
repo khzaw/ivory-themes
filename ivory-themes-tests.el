@@ -376,13 +376,18 @@ keeps integration tests independent of one another."
       (should-not (equal (plist-get label :background)
                          (alist-get 'bg-region palette))))))
 
-(ert-deftest ivory-themes-test-ansi-blue-uses-blue-role ()
-  "ANSI color variables use the public `blue' palette role."
+(ert-deftest ivory-themes-test-ansi-blue-face-uses-blue-role ()
+  "The `ansi-color-blue' face uses the public `blue' palette role.
+This replaces the obsolete `ansi-color-names-vector' variable, which
+was removed in favor of the ansi-color-* faces."
   (dolist (variant '(light dark))
     (let* ((palette (alist-get variant ivory-themes-palettes))
-           (vector (cadr (assq 'ansi-color-names-vector
-                               (ivory-themes--variables palette)))))
-      (should (equal (aref vector 4)
+           (spec (ivory-themes-test--face-attributes
+                  'ansi-color-blue
+                  (ivory-themes--faces-files-buffers palette))))
+      (should (equal (plist-get spec :background)
+                     (alist-get 'blue palette)))
+      (should (equal (plist-get spec :foreground)
                      (alist-get 'blue palette))))))
 
 (ert-deftest ivory-themes-test-override-validation ()

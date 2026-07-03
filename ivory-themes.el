@@ -46,8 +46,9 @@ slightly softened background instead."
 (defcustom ivory-themes-common-palette-overrides nil
   "Palette overrides shared by all Ivory themes.
 
-Each entry has the form (NAME . HEX-COLOR).  The palette names are the
-keys in `ivory-themes-palettes'.  Set this before loading or reloading an
+Each entry has the form (NAME . HEX-COLOR), where NAME is a palette
+role: one of the keys inside each variant's nested alist in
+`ivory-themes-palettes'.  Set this before loading or reloading an
 Ivory theme."
   :type '(alist :key-type symbol :value-type string)
   :group 'ivory-themes)
@@ -69,7 +70,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
 (defun ivory-themes--gray (channel)
   "Return a neutral gray hex color for 8-bit CHANNEL."
   (unless (and (integerp channel) (<= 0 channel 255))
-    (user-error "Ivory gray channel must be an integer from 0 through 255"))
+    (error "Ivory gray channel must be an integer from 0 through 255"))
   (format "#%02x%02x%02x" channel channel channel))
 
 (defun ivory-themes--resolve-palette-value (value)
@@ -197,7 +198,7 @@ branch state, remain explicit hex colors."))
     "Return palette role names for VARIANT."
     (mapcar #'car
             (cdr (or (assq variant ivory-themes-palette-specs)
-                     (user-error "Unknown Ivory theme variant `%s'" variant)))))
+                     (error "Unknown Ivory theme variant `%s'" variant)))))
 
   (defun ivory-themes--duplicate-symbols (symbols)
     "Return duplicated entries from SYMBOLS."
@@ -220,10 +221,10 @@ branch state, remain explicit hex colors."))
              (keys (mapcar #'car (cdr entry)))
              (duplicates (ivory-themes--duplicate-symbols keys)))
         (when duplicates
-          (user-error "Ivory `%s' palette has duplicate roles: %s"
+          (error "Ivory `%s' palette has duplicate roles: %s"
                       variant (mapconcat #'symbol-name duplicates ", ")))
         (unless (equal keys expected)
-          (user-error "Ivory `%s' palette roles differ from `light'" variant))))))
+          (error "Ivory `%s' palette roles differ from `light'" variant))))))
 
 (ivory-themes--validate-palette-specs)
 
@@ -259,24 +260,24 @@ branch state, remain explicit hex colors."))
   (when ivory-themes-soft-backgrounds
     (pcase variant
       ('light '((bg . "#f8f8f8")
-                 (bg-alt . "#f2f2f2")
-                 (bg-subtle . "#f1f1f1")
-                 (bg-modeline-inactive . "#f0f0f0")))
+                (bg-alt . "#f2f2f2")
+                (bg-subtle . "#f1f1f1")
+                (bg-modeline-inactive . "#f0f0f0")))
       ('dark '((bg . "#080808")
-                (bg-alt . "#121212")
-                (bg-subtle . "#111111")
-                (bg-modeline-inactive . "#131313")))
+               (bg-alt . "#121212")
+               (bg-subtle . "#111111")
+               (bg-modeline-inactive . "#131313")))
       (_ nil))))
 
 (defun ivory-themes--alist-get (key alist)
-  "Return KEY from ALIST, or signal a user-facing error."
+  "Return KEY from ALIST, or signal an error."
   (or (alist-get key alist)
-      (user-error "Ivory theme palette is missing `%s'" key)))
+      (error "Ivory theme palette is missing `%s'" key)))
 
 (defun ivory-themes--palette (variant)
   "Return the merged palette for VARIANT."
   (let* ((base (or (alist-get variant ivory-themes-palettes)
-                   (user-error "Unknown Ivory theme variant `%s'" variant)))
+                   (error "Unknown Ivory theme variant `%s'" variant)))
          (variant-overrides
           (pcase variant
             ('light (ivory-themes--validate-palette-overrides
@@ -293,11 +294,13 @@ branch state, remain explicit hex colors."))
 (defmacro ivory-themes--with-colors (palette &rest body)
   "Bind colors from PALETTE around BODY."
   (declare (indent 1))
-  `(let ,(mapcar (lambda (name)
-                   `(,name (ivory-themes--alist-get ',name ,palette)))
-                 ivory-themes--color-names)
-     (ignore ,@ivory-themes--color-names)
-     ,@body))
+  (let ((p (make-symbol "palette")))
+    `(let* ((,p ,palette)
+            ,@(mapcar (lambda (name)
+                        `(,name (ivory-themes--alist-get ',name ,p)))
+                      ivory-themes--color-names))
+       (ignore ,@ivory-themes--color-names)
+       ,@body)))
 
 (defun ivory-themes--face (face spec)
   "Return a `custom-theme-set-faces' entry for FACE using SPEC."
@@ -341,7 +344,6 @@ branch state, remain explicit hex colors."))
        (ivory-themes--face 'show-paren-mismatch `(:background ,bg-removed :foreground ,fg-removed :weight bold))
        (ivory-themes--face 'line-number `(:background ,bg :foreground ,fg-faint))
        (ivory-themes--face 'line-number-current-line `(:background ,bg :foreground ,fg :weight bold))
-       (ivory-themes--face 'linum `(:inherit line-number))
        (ivory-themes--face 'fill-column-indicator `(:foreground ,border))
        (ivory-themes--face 'display-fill-column-indicator `(:foreground ,border))
        (ivory-themes--face 'whitespace-space `(:foreground ,fg-faint))
@@ -1050,17 +1052,14 @@ branch state, remain explicit hex colors."))
 (defun ivory-themes--variables (palette)
   "Return theme variable specs for PALETTE."
   (ivory-themes--with-colors palette
-    `((ansi-color-names-vector
-       [,bg ,red ,green ,yellow ,blue ,fg-alt ,fg-alt ,fg])
-      (fci-rule-color ,border)
-      (pdf-view-midnight-colors (,fg . ,bg)))))
+    `((pdf-view-midnight-colors (,fg . ,bg)))))
 
 (defun ivory-themes--variant (theme)
   "Return the palette variant for THEME."
   (pcase theme
     ('ivory-light 'light)
     ('ivory-dark 'dark)
-    (_ (user-error "Unknown Ivory theme: %s" theme))))
+    (_ (error "Unknown Ivory theme: %s" theme))))
 
 (defun ivory-themes--current-theme ()
   "Return the currently enabled Ivory theme, or `ivory-light'."
@@ -1109,7 +1108,7 @@ branch state, remain explicit hex colors."))
     (apply #'custom-theme-set-variables theme (ivory-themes--variables palette))))
 
 ;;;###autoload
-(when (and (boundp 'custom-theme-load-path) load-file-name)
+(when load-file-name
   (add-to-list 'custom-theme-load-path
                (file-name-as-directory (file-name-directory load-file-name))))
 
