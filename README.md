@@ -54,14 +54,14 @@ surfaces.  Git and diff faces keep red/green directionality by default.
 Set options before loading or reloading a theme.
 
 ```elisp
-(setq ivory-themes-bold-constructs t      ; bold weight for syntax/UI contrast
+(setq ivory-themes-bold-constructs t      ; bold for syntax/content emphasis
       ivory-themes-italic-constructs nil  ; italics where conventional
       ivory-themes-soft-backgrounds nil)  ; pure white/black editor backgrounds
 ```
 
 | Option | Default | Effect |
 | --- | --- | --- |
-| `ivory-themes-bold-constructs` | `t` | Use bold weight to create syntax and UI contrast. |
+| `ivory-themes-bold-constructs` | `t` | Bold weight for syntax/content emphasis; structural UI chrome (modelines, selection/match rows, Magit, diagnostics, top-level headings) stays bold regardless. |
 | `ivory-themes-italic-constructs` | `nil` | Allow italics in faces that conventionally use them. |
 | `ivory-themes-soft-backgrounds` | `nil` | Replace the pure white/black editor background with a slightly softened one. |
 

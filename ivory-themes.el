@@ -25,7 +25,12 @@
   :tag "Ivory Themes")
 
 (defcustom ivory-themes-bold-constructs t
-  "When non-nil, use bold weight to create syntax and UI contrast."
+  "When non-nil, use bold weight for syntax/content emphasis.
+
+This option governs syntax and content-driven construct emphasis.
+Structural UI chrome stays bold regardless, including modelines,
+selection and match rows, Magit chrome, diagnostics, and top-level
+headings 1-3."
   :type 'boolean
   :group 'ivory-themes)
 
@@ -566,8 +571,8 @@ branch state, remain explicit hex colors."))
        (ivory-themes--face 'org-todo `(:foreground ,red :weight bold))
        (ivory-themes--face 'org-done `(:foreground ,green :weight bold))
        (ivory-themes--face 'org-headline-done `(:foreground ,fg-dim :strike-through t))
-       (ivory-themes--face 'org-checkbox `(:foreground ,fg :weight bold))
-       (ivory-themes--face 'org-priority `(:foreground ,fg :weight bold))
+       (ivory-themes--face 'org-checkbox `(:foreground ,fg :weight ,bold))
+       (ivory-themes--face 'org-priority `(:foreground ,fg :weight ,bold))
        (ivory-themes--face 'org-list-dt `(:foreground ,fg :weight ,bold))
        (ivory-themes--face 'org-hide `(:foreground ,bg))
        (ivory-themes--face 'org-agenda-date `(:foreground ,fg :weight bold))
@@ -586,10 +591,10 @@ branch state, remain explicit hex colors."))
        (ivory-themes--face 'org-modern-date-inactive `(:foreground ,fg-dim :underline t))
        (ivory-themes--face 'org-modern-todo `(:inherit org-todo))
        (ivory-themes--face 'org-modern-done `(:inherit org-done))
-       (ivory-themes--face 'markdown-header-face `(:foreground ,fg :weight bold))
-       (ivory-themes--face 'markdown-header-face-1 `(:inherit markdown-header-face :height 1.30))
-       (ivory-themes--face 'markdown-header-face-2 `(:inherit markdown-header-face :height 1.20))
-       (ivory-themes--face 'markdown-header-face-3 `(:inherit markdown-header-face :height 1.12))
+       (ivory-themes--face 'markdown-header-face `(:foreground ,fg :weight ,bold))
+       (ivory-themes--face 'markdown-header-face-1 `(:inherit markdown-header-face :weight bold :height 1.30))
+       (ivory-themes--face 'markdown-header-face-2 `(:inherit markdown-header-face :weight bold :height 1.20))
+       (ivory-themes--face 'markdown-header-face-3 `(:inherit markdown-header-face :weight bold :height 1.12))
        (ivory-themes--face 'markdown-header-face-4 `(:inherit markdown-header-face :height 1.06))
        (ivory-themes--face 'markdown-header-face-5 `(:inherit markdown-header-face))
        (ivory-themes--face 'markdown-header-face-6 `(:inherit markdown-header-face :foreground ,fg-alt))
@@ -610,7 +615,7 @@ branch state, remain explicit hex colors."))
        (ivory-themes--face 'markdown-bold-face `(:weight bold))
        (ivory-themes--face 'markdown-italic-face `(:slant ,slant))
        (ivory-themes--face 'markdown-strike-through-face `(:strike-through t :foreground ,fg-dim))
-       (ivory-themes--face 'markdown-gfm-checkbox-face `(:foreground ,fg :weight bold))
+       (ivory-themes--face 'markdown-gfm-checkbox-face `(:foreground ,fg :weight ,bold))
        (ivory-themes--face 'md-ts-delimiter `(:inherit markdown-markup-face))
        (ivory-themes--face 'md-ts-heading-1 `(:inherit markdown-header-face-1))
        (ivory-themes--face 'md-ts-heading-2 `(:inherit markdown-header-face-2))
@@ -836,7 +841,7 @@ branch state, remain explicit hex colors."))
   (ivory-themes--with-colors palette
     (let ((bold (if ivory-themes-bold-constructs 'bold 'normal)))
       (list
-       (ivory-themes--face 'dired-directory `(:foreground ,fg :weight bold))
+       (ivory-themes--face 'dired-directory `(:foreground ,fg :weight ,bold))
        (ivory-themes--face 'dired-flagged `(:foreground ,red :weight bold))
        (ivory-themes--face 'dired-header `(:foreground ,fg :weight bold))
        (ivory-themes--face 'dired-ignored `(:foreground ,fg-faint))
@@ -899,9 +904,9 @@ branch state, remain explicit hex colors."))
        (ivory-themes--face 'ibuffer-deletion-face `(:foreground ,red :strike-through t))
        (ivory-themes--face 'ibuffer-filter-group-name-face `(:foreground ,fg :weight bold))
        (ivory-themes--face 'eshell-prompt `(:foreground ,fg :weight bold))
-       (ivory-themes--face 'eshell-ls-directory `(:foreground ,fg :weight bold))
-       (ivory-themes--face 'eshell-ls-symlink `(:foreground ,fg-alt :weight bold))
-       (ivory-themes--face 'eshell-ls-executable `(:foreground ,fg :weight bold))
+       (ivory-themes--face 'eshell-ls-directory `(:foreground ,fg :weight ,bold))
+       (ivory-themes--face 'eshell-ls-symlink `(:foreground ,fg-alt :weight ,bold))
+       (ivory-themes--face 'eshell-ls-executable `(:foreground ,fg :weight ,bold))
        (ivory-themes--face 'eshell-ls-readonly `(:foreground ,fg-dim))
        (ivory-themes--face 'eshell-ls-unreadable `(:foreground ,fg-faint))
        (ivory-themes--face 'vterm-color-black `(:background ,bg :foreground ,fg-faint))
