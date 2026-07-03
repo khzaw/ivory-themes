@@ -6,7 +6,7 @@
 ;; Author: Kaung Htet
 ;; Maintainer: Kaung Htet
 ;; URL: https://github.com/khzaw/ivory-themes
-;; Version: 0.1.0
+;; Version: 1.0
 ;; Package-Requires: ((emacs "28.1"))
 ;; Keywords: faces, theme
 
