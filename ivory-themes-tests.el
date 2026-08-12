@@ -278,6 +278,71 @@ keeps integration tests independent of one another."
                                :inherit)
                     'markdown-inline-code-face))))))
 
+(ert-deftest ivory-themes-test-eglot-semantic-faces-preserve-comment-color ()
+  "Eglot semantic faces should not override comment foregrounds."
+  (dolist (variant '(light dark))
+    (let* ((palette (ivory-themes--palette variant))
+           (faces (ivory-themes--faces-diagnostics palette))
+           (neutral-faces
+            '(eglot-semantic-abstract
+              eglot-semantic-async
+              eglot-semantic-class
+              eglot-semantic-declaration
+              eglot-semantic-decorator
+              eglot-semantic-defaultLibrary
+              eglot-semantic-definition
+              eglot-semantic-documentation
+              eglot-semantic-enum
+              eglot-semantic-enumMember
+              eglot-semantic-event
+              eglot-semantic-function
+              eglot-semantic-interface
+              eglot-semantic-keyword
+              eglot-semantic-macro
+              eglot-semantic-method
+              eglot-semantic-modification
+              eglot-semantic-modifier
+              eglot-semantic-namespace
+              eglot-semantic-number
+              eglot-semantic-operator
+              eglot-semantic-parameter
+              eglot-semantic-property
+              eglot-semantic-readonly
+              eglot-semantic-regexp
+              eglot-semantic-static
+              eglot-semantic-string
+              eglot-semantic-struct
+              eglot-semantic-type
+              eglot-semantic-typeParameter
+              eglot-semantic-variable)))
+      (dolist (face neutral-faces)
+        (let ((attributes (ivory-themes-test--face-attributes face faces)))
+          (should-not (plist-member attributes :foreground))
+          (should-not (plist-member attributes :inherit))))
+      (should (eq (plist-get (ivory-themes-test--face-attributes
+                              'eglot-semantic-definition faces)
+                             :weight)
+                  'bold))
+      (should-not (plist-member (ivory-themes-test--face-attributes
+                                 'eglot-semantic-variable faces)
+                                :weight))
+      (should (eq (plist-get (ivory-themes-test--face-attributes
+                              'eglot-semantic-comment faces)
+                             :inherit)
+                  'font-lock-comment-face)))))
+
+(ert-deftest ivory-themes-test-eglot-unnecessary-diagnostics-stand-out ()
+  "Unnecessary code should stay dim while remaining easy to notice."
+  (dolist (variant '(light dark))
+    (let* ((palette (ivory-themes--palette variant))
+           (faces (ivory-themes--faces-diagnostics palette))
+           (attributes
+            (ivory-themes-test--face-attributes
+             'eglot-diagnostic-tag-unnecessary-face faces)))
+      (should (equal (plist-get attributes :foreground)
+                     (alist-get 'fg-dim palette)))
+      (should (eq (plist-get attributes :weight) 'bold)))))
+
 (ert-deftest ivory-themes-test-magit-current-branch-stands-out ()
   "The current branch should differ from local branches and neutral tags."
   (dolist (variant '(light dark))
