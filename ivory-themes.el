@@ -168,7 +168,7 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
           (fg-name . (gray 156))
           (fg-syntax . (gray 156))
           (fg-string . (gray 194))
-          (fg-comment . (gray 94))
+          (fg-comment . (gray 92))
           (fg-comment-delimiter . (gray 90))
           (fg-inactive . (gray 119))
           (border . (gray 40))
