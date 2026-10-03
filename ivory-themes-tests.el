@@ -278,6 +278,46 @@ keeps integration tests independent of one another."
                                :inherit)
                     'markdown-inline-code-face))))))
 
+(ert-deftest ivory-themes-test-eglot-semantic-faces-follow-bold-option ()
+  "Semantic emphasis follows the bold option while UI cues stay bold."
+  (dolist (enabled '(t nil))
+    (let ((ivory-themes-bold-constructs enabled)
+          (weight (if enabled 'bold 'normal)))
+      (dolist (variant '(light dark))
+        (let ((faces (ivory-themes--faces-diagnostics
+                      (ivory-themes--palette variant))))
+          (dolist (face '(eglot-semantic-abstract
+                          eglot-semantic-async
+                          eglot-semantic-class
+                          eglot-semantic-declaration
+                          eglot-semantic-decorator
+                          eglot-semantic-defaultLibrary
+                          eglot-semantic-definition
+                          eglot-semantic-enum
+                          eglot-semantic-function
+                          eglot-semantic-interface
+                          eglot-semantic-keyword
+                          eglot-semantic-macro
+                          eglot-semantic-method
+                          eglot-semantic-modification
+                          eglot-semantic-modifier
+                          eglot-semantic-namespace
+                          eglot-semantic-operator
+                          eglot-semantic-static
+                          eglot-semantic-struct
+                          eglot-semantic-type
+                          eglot-semantic-typeParameter))
+            (should (eq (plist-get (ivory-themes-test--face-attributes
+                                   face faces)
+                                  :weight)
+                        weight)))
+          (dolist (face '(eglot-mode-line
+                          eglot-diagnostic-tag-unnecessary-face))
+            (should (eq (plist-get (ivory-themes-test--face-attributes
+                                   face faces)
+                                  :weight)
+                        'bold))))))))
+
 (ert-deftest ivory-themes-test-eglot-semantic-faces-preserve-comment-color ()
   "Eglot semantic faces should not override comment foregrounds."
   (dolist (variant '(light dark))
