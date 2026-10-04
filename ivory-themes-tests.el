@@ -427,7 +427,7 @@ keeps integration tests independent of one another."
       (should (equal (plist-get open :foreground)
                      (alist-get 'fg palette)))
       (should (equal (plist-get merged :foreground)
-                     (alist-get 'border palette)))
+                     (alist-get 'fg-inactive palette)))
       (should (eq (plist-get merged :strike-through) t))
       (should (eq (plist-get merged :weight) 'normal))
       (should-not (plist-member merged :box))
@@ -446,6 +446,23 @@ keeps integration tests independent of one another."
                          (plist-get merged :foreground)))
       (should-not (equal (plist-get merged :foreground)
                          (plist-get rejected :foreground))))))
+
+(ert-deftest ivory-themes-test-forge-completed-text-remains-readable ()
+  "Completed Forge text stays readable on editor and section surfaces."
+  (dolist (soft '(nil t))
+    (let ((ivory-themes-soft-backgrounds soft))
+      (dolist (variant '(light dark))
+        (let* ((palette (ivory-themes--palette variant))
+               (faces (ivory-themes--faces-vcs palette)))
+          (dolist (face '(forge-pullreq-merged forge-topic-slug-realized))
+            (let ((attributes (ivory-themes-test--face-attributes face faces)))
+              (should (eq (plist-get attributes :strike-through) t))
+              (should (eq (plist-get attributes :weight) 'normal))
+              (dolist (surface '(bg bg-subtle bg-block))
+                (should (>= (ivory-themes-test--contrast-ratio
+                             (plist-get attributes :foreground)
+                             (alist-get surface palette))
+                            3.0))))))))))
 
 (ert-deftest ivory-themes-test-forge-status-faces-compose-with-states ()
   "Forge notification status faces should not replace state colors."
