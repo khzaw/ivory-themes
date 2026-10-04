@@ -28,9 +28,8 @@
   "When non-nil, use bold weight for syntax/content emphasis.
 
 This option governs syntax and content-driven construct emphasis.
-Structural UI chrome stays bold regardless, including modelines,
-selection and match rows, Magit chrome, diagnostics, and top-level
-headings 1-3."
+Modelines, completion match text, Magit chrome, diagnostics, and
+top-level headings 1-3 stay bold regardless."
   :type 'boolean
   :group 'ivory-themes)
 
@@ -440,7 +439,7 @@ branch state, remain explicit hex colors."))
   "Return completion, narrowing, and minibuffer package faces for PALETTE."
   (ivory-themes--with-colors palette
     (let ((match `(:foreground ,fg :weight bold))
-          (selected `(:background ,bg-active :foreground ,fg :weight bold)))
+          (selected `(:background ,bg-active :foreground ,fg)))
       (append
        (list
         (ivory-themes--face 'completions-annotations `(:foreground ,fg-dim))
@@ -1027,9 +1026,9 @@ branch state, remain explicit hex colors."))
         (ivory-themes--face 'symbol-overlay-face-2 `(:background ,bg-search))
         (ivory-themes--face 'symbol-overlay-face-3 `(:background ,bg-hl))
         (ivory-themes--face 'symbol-overlay-face-4 `(:background ,bg-region))
-        (ivory-themes--face 'symbol-overlay-face-5 `(:background ,bg-removed-faint))
-        (ivory-themes--face 'symbol-overlay-face-6 `(:background ,bg-changed-faint))
-        (ivory-themes--face 'symbol-overlay-face-7 `(:background ,bg-added-faint))
+        (ivory-themes--face 'symbol-overlay-face-5 `(:background ,bg-active :underline t))
+        (ivory-themes--face 'symbol-overlay-face-6 `(:background ,bg-search :underline t))
+        (ivory-themes--face 'symbol-overlay-face-7 `(:background ,bg-region :underline t))
         (ivory-themes--face 'symbol-overlay-face-8 `(:background ,bg-block))
         (ivory-themes--face 'breadcrumb-project-base-face `(:foreground ,fg-dim))
         (ivory-themes--face 'breadcrumb-project-crumbs-face `(:foreground ,fg-alt))

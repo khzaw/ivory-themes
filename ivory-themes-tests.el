@@ -411,6 +411,55 @@ keeps integration tests independent of one another."
       (should-not (plist-member local :background))
       (should-not (plist-member local :box)))))
 
+(ert-deftest ivory-themes-test-completion-selection-preserves-match-emphasis ()
+  "Selection backgrounds leave bold emphasis to matching characters."
+  (dolist (enabled '(nil t))
+    (let ((ivory-themes-bold-constructs enabled))
+      (dolist (variant '(light dark))
+        (let* ((palette (ivory-themes--palette variant))
+               (faces (ivory-themes--faces-completion palette)))
+          (dolist (face '(completions-highlight vertico-current corfu-current
+                          company-tooltip-selection ivy-current-match
+                          helm-selection))
+            (let ((attributes (ivory-themes-test--face-attributes face faces)))
+              (should (equal (plist-get attributes :background)
+                             (alist-get 'bg-active palette)))
+              (should-not (plist-member attributes :weight))))
+          (dolist (face '(completions-common-part completions-first-difference
+                          orderless-match-face-0 orderless-match-face-1
+                          orderless-match-face-2 orderless-match-face-3
+                          consult-highlight-match company-tooltip-common
+                          company-tooltip-common-selection company-preview-common
+                          ivy-minibuffer-match-face-1 ivy-minibuffer-match-face-2
+                          ivy-minibuffer-match-face-3 ivy-minibuffer-match-face-4
+                          helm-match))
+            (let ((attributes (ivory-themes-test--face-attributes face faces)))
+              (should (eq (plist-get attributes :weight) 'bold))
+              (should-not (plist-member attributes :background)))))))))
+
+(ert-deftest ivory-themes-test-symbol-overlays-use-distinct-neutral-cues ()
+  "Symbol tracking uses distinct neutral styles without changing syntax."
+  (dolist (soft '(nil t))
+    (let ((ivory-themes-soft-backgrounds soft))
+      (dolist (variant '(light dark))
+        (let ((faces (ivory-themes--faces-misc (ivory-themes--palette variant)))
+              seen)
+          (dolist (face '(symbol-overlay-face-1 symbol-overlay-face-2
+                          symbol-overlay-face-3 symbol-overlay-face-4
+                          symbol-overlay-face-5 symbol-overlay-face-6
+                          symbol-overlay-face-7 symbol-overlay-face-8))
+            (let* ((attributes (ivory-themes-test--face-attributes face faces))
+                   (background (plist-get attributes :background))
+                   (style (list background (plist-get attributes :underline))))
+              (should (ivory-themes--hex-color-p background))
+              (should (equal (substring background 1 3)
+                             (substring background 3 5)))
+              (should (equal (substring background 3 5)
+                             (substring background 5 7)))
+              (should-not (plist-member attributes :foreground))
+              (should-not (member style seen))
+              (push style seen))))))))
+
 (ert-deftest ivory-themes-test-forge-pull-request-states-stay-distinct ()
   "Forge pull request states should be distinguishable without loud colors."
   (dolist (variant '(light dark))

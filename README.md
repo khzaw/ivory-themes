@@ -61,9 +61,13 @@ Set options before loading or reloading a theme.
 
 | Option | Default | Effect |
 | --- | --- | --- |
-| `ivory-themes-bold-constructs` | `t` | Bold weight for syntax/content emphasis; structural UI chrome (modelines, selection/match rows, Magit, diagnostics, top-level headings) stays bold regardless. |
+| `ivory-themes-bold-constructs` | `t` | Bold weight for syntax/content emphasis; modelines, completion match text, Magit, diagnostics, and top-level headings stay bold regardless. |
 | `ivory-themes-italic-constructs` | `nil` | Allow italics in faces that conventionally use them. |
 | `ivory-themes-soft-backgrounds` | `nil` | Replace the pure white/black editor background with a slightly softened one. |
+
+Completion selections use background shading; matches retain bold emphasis.
+Symbol overlays use gray backgrounds, with underlines distinguishing overlays
+that share a shade.
 
 ### Softened backgrounds
 
