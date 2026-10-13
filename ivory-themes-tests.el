@@ -408,7 +408,8 @@ keeps integration tests independent of one another."
                          (plist-get tag :background)))
       (should-not (equal (plist-get (plist-get current :box) :color)
                          (plist-get (plist-get tag :box) :color)))
-      (should-not (plist-member local :background))
+      (should-not (equal (plist-get current :background)
+                         (plist-get local :background)))
       (should-not (plist-member local :box)))))
 
 (ert-deftest ivory-themes-test-completion-selection-preserves-match-emphasis ()

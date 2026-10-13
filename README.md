@@ -7,6 +7,8 @@ Ivory is a minimal, near-monochromatic Emacs theme package with two variants:
 
 Most syntax contrast comes from weight, foreground intensity, and background
 surfaces.  Git and diff faces keep red/green directionality by default.
+Magit branch labels use blue backgrounds for local branches and violet for
+remote branches; the current branch has a green background and border.
 
 ## Installation
 ### `use-package` With `:vc`
@@ -144,6 +146,7 @@ Palette roles:
 | --- | --- |
 | Backgrounds | `bg`, `bg-alt`, `bg-dim`, `bg-active`, `bg-subtle`, `bg-block`, `bg-hl`, `bg-region`, `bg-search`, `bg-modeline`, `bg-modeline-inactive` |
 | Code backgrounds | `bg-code-block`, `bg-code-inline` |
+| Branch labels | `bg-branch-current`, `bg-branch-local`, `bg-branch-remote`, `branch-current-border` |
 | Foregrounds | `fg`, `fg-alt`, `fg-dim`, `fg-faint`, `fg-name`, `fg-syntax`, `fg-string`, `fg-comment`, `fg-comment-delimiter`, `fg-inactive` |
 | UI structure | `border`, `cursor`, `modeline-accent` |
 | Accents and ANSI roles | `red`, `red-faint`, `green`, `green-faint`, `yellow`, `blue` |

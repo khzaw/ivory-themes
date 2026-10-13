@@ -107,6 +107,8 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
           (bg-code-block . (gray 238))
           (bg-code-inline . (gray 232))
           (bg-branch-current . "#e9f4ed")
+          (bg-branch-local . "#e5eff7")
+          (bg-branch-remote . "#eee7f5")
           (bg-hl . (gray 238))
           (bg-region . (gray 216))
           (bg-search . (gray 208))
@@ -154,6 +156,8 @@ This uses the same format as `ivory-themes-common-palette-overrides'."
           (bg-code-block . (gray 20))
           (bg-code-inline . (gray 28))
           (bg-branch-current . "#102018")
+          (bg-branch-local . "#182f3f")
+          (bg-branch-remote . "#30243e")
           (bg-hl . (gray 26))
           (bg-region . (gray 58))
           (bg-search . (gray 74))
@@ -692,10 +696,12 @@ branch state, remain explicit hex colors."))
      (ivory-themes--face 'magit-branch-current
                          `(:background ,bg-branch-current :foreground ,fg :weight bold
                            :box (:line-width -1 :color ,branch-current-border)))
-     (ivory-themes--face 'magit-branch-local `(:foreground ,fg :weight bold))
-     (ivory-themes--face 'magit-branch-remote `(:foreground ,fg-alt :weight bold))
+     (ivory-themes--face 'magit-branch-local
+                         `(:background ,bg-branch-local :foreground ,fg :weight bold))
+     (ivory-themes--face 'magit-branch-remote
+                         `(:background ,bg-branch-remote :foreground ,fg :weight bold))
      (ivory-themes--face 'magit-branch-remote-head `(:inherit magit-branch-remote :box (:line-width -1 :color ,border)))
-     (ivory-themes--face 'magit-branch-upstream `(:foreground ,fg-dim :slant normal))
+     (ivory-themes--face 'magit-branch-upstream `(:foreground ,fg :slant normal))
      (ivory-themes--face 'magit-branch-warning `(:inherit warning))
      (ivory-themes--face 'magit-head `(:foreground ,fg :weight bold :box (:line-width -1 :color ,border)))
      (ivory-themes--face 'magit-refname `(:foreground ,fg-dim))
