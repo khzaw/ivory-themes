@@ -71,6 +71,11 @@ Completion selections use background shading; matches retain bold emphasis.
 Symbol overlays use gray backgrounds, with underlines distinguishing overlays
 that share a shade.
 
+Dark syntax uses separate gray tiers for definitions, calls, and types.
+Definitions and types retain optional bold emphasis, while calls and builtins
+stay regular-weight.  Eglot leaves calls and assignments at their underlying
+font-lock weight rather than making them all bold.  Light syntax is unchanged.
+
 ### Softened backgrounds
 
 By default `ivory-light` uses pure white and `ivory-dark` uses pure black for
@@ -147,7 +152,7 @@ Palette roles:
 | Backgrounds | `bg`, `bg-alt`, `bg-dim`, `bg-active`, `bg-subtle`, `bg-block`, `bg-hl`, `bg-region`, `bg-search`, `bg-modeline`, `bg-modeline-inactive` |
 | Code backgrounds | `bg-code-block`, `bg-code-inline` |
 | Branch labels | `bg-branch-current`, `bg-branch-local`, `bg-branch-remote`, `branch-current-border` |
-| Foregrounds | `fg`, `fg-alt`, `fg-dim`, `fg-faint`, `fg-name`, `fg-syntax`, `fg-string`, `fg-comment`, `fg-comment-delimiter`, `fg-inactive` |
+| Foregrounds | `fg`, `fg-alt`, `fg-dim`, `fg-faint`, `fg-name`, `fg-definition`, `fg-call`, `fg-type`, `fg-syntax`, `fg-string`, `fg-comment`, `fg-comment-delimiter`, `fg-inactive` |
 | UI structure | `border`, `cursor`, `modeline-accent` |
 | Accents and ANSI roles | `red`, `red-faint`, `green`, `green-faint`, `yellow`, `blue` |
 | Diff backgrounds | `bg-added`, `bg-added-faint`, `bg-removed`, `bg-removed-faint`, `bg-changed`, `bg-changed-faint` |
