@@ -147,7 +147,7 @@ keeps integration tests independent of one another."
   (let ((ivory-themes-bold-constructs t))
     (dolist (variant '(light dark))
       (let* ((palette (ivory-themes--palette variant))
-             (faces (ivory-themes--faces-font-lock palette))
+             (faces (ivory-themes--faces-font-lock palette variant))
              (heredoc (ivory-themes-test--face-attributes
                        'sh-heredoc faces))
              (quoted-exec (ivory-themes-test--face-attributes
@@ -187,7 +187,7 @@ keeps integration tests independent of one another."
   "Makefile whitespace warnings should use Ivory roles, not Emacs hotpink."
   (dolist (variant '(light dark))
     (let* ((palette (ivory-themes--palette variant))
-           (faces (ivory-themes--faces-font-lock palette))
+           (faces (ivory-themes--faces-font-lock palette variant))
            (space (ivory-themes-test--face-attributes
                    'makefile-space faces)))
       (should (equal (plist-get space :background)
@@ -244,11 +244,94 @@ keeps integration tests independent of one another."
   (dolist (variant '(light dark))
     (let* ((palette (alist-get variant ivory-themes-palettes))
            (bg (alist-get 'bg palette)))
-      (dolist (role '(fg fg-alt fg-name fg-syntax fg-string fg-comment
+      (dolist (role '(fg fg-alt fg-name fg-definition fg-call fg-type
+                         fg-syntax fg-string fg-comment
                          fg-comment-delimiter fg-dim fg-faint fg-inactive))
         (should (>= (ivory-themes-test--contrast-ratio
                      bg (alist-get role palette))
                     3.0))))))
+
+(ert-deftest ivory-themes-test-dark-syntax-retains-monochrome-hierarchy ()
+  "Muted syntax stays readable and distinct without changing the editor fg."
+  (dolist (soft '(nil t))
+    (let* ((ivory-themes-soft-backgrounds soft)
+           (palette (ivory-themes--palette 'dark)))
+      (should (equal (alist-get 'fg palette) "#eeeeee"))
+      (let ((previous (alist-get 'fg palette)))
+        (dolist (role '(fg-definition fg-call fg-type fg-name fg-comment))
+          (let ((color (alist-get role palette)))
+            (should (equal (substring color 1 3) (substring color 3 5)))
+            (should (equal (substring color 3 5) (substring color 5 7)))
+            (should (> (ivory-themes-test--relative-luminance previous)
+                       (ivory-themes-test--relative-luminance color)))
+            (setq previous color))))
+      (dolist (role '(fg-definition fg-call fg-type))
+        (dolist (surface '(bg bg-subtle bg-code-block))
+          (should (>= (ivory-themes-test--contrast-ratio
+                       (alist-get role palette) (alist-get surface palette))
+                      4.5)))))))
+
+(ert-deftest ivory-themes-test-dark-syntax-separates-calls-from-definitions ()
+  "Calls stay regular while definitions and types respect the bold option."
+  (dolist (enabled '(nil t))
+    (let* ((ivory-themes-bold-constructs enabled)
+           (weight (if enabled 'bold 'normal))
+           (palette (ivory-themes--palette 'dark))
+           (faces (ivory-themes--faces-font-lock palette 'dark)))
+      (dolist (entry '((font-lock-function-name-face . fg-definition)
+                       (font-lock-type-face . fg-type)))
+        (let ((attributes (ivory-themes-test--face-attributes (car entry) faces)))
+          (should (equal (plist-get attributes :foreground)
+                         (alist-get (cdr entry) palette)))
+          (should (eq (plist-get attributes :weight) weight))))
+      (dolist (face '(font-lock-function-call-face tree-sitter-hl-face:function.call))
+        (let ((attributes (ivory-themes-test--face-attributes face faces)))
+          (should (equal (plist-get attributes :foreground)
+                         (alist-get 'fg-call palette)))
+          (should (eq (plist-get attributes :weight) 'normal))
+          (should-not (plist-member attributes :inherit))))
+      (should (eq (plist-get (ivory-themes-test--face-attributes
+                              'font-lock-builtin-face faces)
+                             :weight)
+                  'normal)))))
+
+(ert-deftest ivory-themes-test-light-syntax-keeps-existing-emphasis ()
+  "Light syntax keeps its original colors, weights, and call inheritance."
+  (dolist (enabled '(nil t))
+    (let* ((ivory-themes-bold-constructs enabled)
+           (weight (if enabled 'bold 'normal))
+           (palette (ivory-themes--palette 'light))
+           (faces (ivory-themes--faces-font-lock palette 'light)))
+      (dolist (face '(font-lock-function-name-face font-lock-type-face
+                      font-lock-builtin-face font-lock-keyword-face))
+        (let ((attributes (ivory-themes-test--face-attributes face faces)))
+          (should (equal (plist-get attributes :foreground)
+                         (alist-get 'fg palette)))
+          (should (eq (plist-get attributes :weight) weight))))
+      (should (equal (ivory-themes-test--face-attributes
+                      'font-lock-function-call-face faces)
+                     `(:inherit font-lock-function-name-face
+                       :foreground ,(alist-get 'fg palette))))
+      (should (equal (ivory-themes-test--face-attributes
+                      'tree-sitter-hl-face:function.call faces)
+                     `(:foreground ,(alist-get 'fg palette)))))))
+
+(ert-deftest ivory-themes-test-syntax-foreground-overrides ()
+  "Definition, call, and type roles can be tuned independently."
+  (let ((ivory-themes-common-palette-overrides
+         '((fg-definition . "#cccccc")
+           (fg-call . "#bbbbbb")
+           (fg-type . "#aaaaaa"))))
+    (dolist (variant '(light dark))
+      (let* ((palette (ivory-themes--palette variant))
+             (faces (ivory-themes--faces-font-lock palette variant)))
+        (dolist (entry '((font-lock-function-name-face . "#cccccc")
+                         (font-lock-function-call-face . "#bbbbbb")
+                         (tree-sitter-hl-face:function.call . "#bbbbbb")
+                         (font-lock-type-face . "#aaaaaa")))
+          (should (equal (plist-get (ivory-themes-test--face-attributes (car entry) faces)
+                                   :foreground)
+                         (cdr entry))))))))
 
 (ert-deftest ivory-themes-test-writing-code-faces-use-dedicated-surfaces ()
   "Org and Markdown code faces use stronger code-specific surfaces."
@@ -279,13 +362,20 @@ keeps integration tests independent of one another."
                     'markdown-inline-code-face))))))
 
 (ert-deftest ivory-themes-test-eglot-semantic-faces-follow-bold-option ()
-  "Semantic emphasis follows the bold option while UI cues stay bold."
+  "Semantic emphasis follows the bold option without flattening dark syntax."
   (dolist (enabled '(t nil))
     (let ((ivory-themes-bold-constructs enabled)
-          (weight (if enabled 'bold 'normal)))
+          (weight (if enabled 'bold 'normal))
+          (contextual-faces '(eglot-semantic-declaration
+                              eglot-semantic-defaultLibrary
+                              eglot-semantic-definition
+                              eglot-semantic-function
+                              eglot-semantic-method
+                              eglot-semantic-modification
+                              eglot-semantic-operator)))
       (dolist (variant '(light dark))
         (let ((faces (ivory-themes--faces-diagnostics
-                      (ivory-themes--palette variant))))
+                      (ivory-themes--palette variant) variant)))
           (dolist (face '(eglot-semantic-abstract
                           eglot-semantic-async
                           eglot-semantic-class
@@ -310,7 +400,9 @@ keeps integration tests independent of one another."
             (should (eq (plist-get (ivory-themes-test--face-attributes
                                    face faces)
                                   :weight)
-                        weight)))
+                        (unless (and (eq variant 'dark)
+                                     (memq face contextual-faces))
+                          weight))))
           (dolist (face '(eglot-mode-line
                           eglot-diagnostic-tag-unnecessary-face))
             (should (eq (plist-get (ivory-themes-test--face-attributes
@@ -322,7 +414,7 @@ keeps integration tests independent of one another."
   "Eglot semantic faces should not override comment foregrounds."
   (dolist (variant '(light dark))
     (let* ((palette (ivory-themes--palette variant))
-           (faces (ivory-themes--faces-diagnostics palette))
+           (faces (ivory-themes--faces-diagnostics palette variant))
            (neutral-faces
             '(eglot-semantic-abstract
               eglot-semantic-async
@@ -362,7 +454,7 @@ keeps integration tests independent of one another."
       (should (eq (plist-get (ivory-themes-test--face-attributes
                               'eglot-semantic-definition faces)
                              :weight)
-                  'bold))
+                  (unless (eq variant 'dark) 'bold)))
       (should-not (plist-member (ivory-themes-test--face-attributes
                                  'eglot-semantic-variable faces)
                                 :weight))
@@ -375,7 +467,7 @@ keeps integration tests independent of one another."
   "Unnecessary code should stay dim while remaining easy to notice."
   (dolist (variant '(light dark))
     (let* ((palette (ivory-themes--palette variant))
-           (faces (ivory-themes--faces-diagnostics palette))
+           (faces (ivory-themes--faces-diagnostics palette variant))
            (attributes
             (ivory-themes-test--face-attributes
              'eglot-diagnostic-tag-unnecessary-face faces)))
@@ -630,6 +722,40 @@ Regression test for the apply-then-enable order in `ivory-themes-load'."
       (ivory-themes-test--reset-light-theme)
       (when (memq 'ivory-dark custom-enabled-themes)
         (disable-theme 'ivory-dark)))))
+
+(ert-deftest ivory-themes-test-disabled-reload-refreshes-syntax ()
+  "Reloading a disabled theme must not restore stale syntax settings."
+  (require 'font-lock)
+  (let ((theme-dir (file-name-directory (locate-library "ivory-themes")))
+        (ivory-themes-bold-constructs t)
+        (ivory-themes-common-palette-overrides nil)
+        (ivory-themes-dark-palette-overrides '((fg-type . "#eeeeee"))))
+    (unwind-protect
+        (progn
+          (when (memq 'ivory-dark custom-enabled-themes)
+            (disable-theme 'ivory-dark))
+          (put 'ivory-dark 'theme-settings nil)
+          (let ((custom-theme-load-path (list theme-dir)))
+            (ivory-themes-load 'ivory-dark))
+          (should (equal (face-foreground 'font-lock-type-face) "#eeeeee"))
+          (disable-theme 'ivory-dark)
+          (setq ivory-themes-bold-constructs nil
+                ivory-themes-dark-palette-overrides nil)
+          ;; Match the local development workflow: reload the variant file
+          ;; while disabled, then enable it again.
+          (load (expand-file-name "ivory-dark-theme.el" theme-dir) nil t)
+          (enable-theme 'ivory-dark)
+          (should (equal (face-foreground 'font-lock-type-face) "#b8b8b8"))
+          (should (eq (face-attribute 'font-lock-type-face :weight) 'normal))
+          (should (= (cl-count-if
+                      (lambda (entry)
+                        (and (eq (car entry) 'theme-face)
+                             (eq (cadr entry) 'font-lock-type-face)))
+                      (get 'ivory-dark 'theme-settings))
+                     1)))
+      (when (memq 'ivory-dark custom-enabled-themes)
+        (disable-theme 'ivory-dark))
+      (put 'ivory-dark 'theme-settings nil))))
 
 (provide 'ivory-themes-tests)
 
