@@ -905,6 +905,7 @@ Regression test for the apply-then-enable order in `ivory-themes-load'."
       (put 'ivory-dark 'theme-settings nil))))
 
 (ert-deftest ivory-themes-test-autoloads-register-theme-directory ()
+  "Generated package autoloads add the package directory to the theme path."
   (let* ((source (locate-library "ivory-themes.el"))
          (package-dir (file-name-as-directory
                        (make-temp-file "ivory-themes-autoloads" t)))
