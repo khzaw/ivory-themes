@@ -11,6 +11,7 @@
 
 (require 'ert)
 (require 'cl-lib)
+(require 'package)
 (require 'ivory-themes)
 
 (defun ivory-themes-test--relative-luminance (hex)
@@ -756,6 +757,22 @@ Regression test for the apply-then-enable order in `ivory-themes-load'."
       (when (memq 'ivory-dark custom-enabled-themes)
         (disable-theme 'ivory-dark))
       (put 'ivory-dark 'theme-settings nil))))
+
+(ert-deftest ivory-themes-test-autoloads-register-theme-directory ()
+  (let* ((source (locate-library "ivory-themes.el"))
+         (package-dir (file-name-as-directory
+                       (make-temp-file "ivory-themes-autoloads" t)))
+         (autoloads (expand-file-name "ivory-themes-autoloads.el" package-dir))
+         (inhibit-message t))
+    (unwind-protect
+        (progn
+          (copy-file source package-dir)
+          (package-generate-autoloads 'ivory-themes package-dir)
+          (let ((custom-theme-load-path '(custom-theme-directory t)))
+            (load autoloads nil t)
+            (should (equal custom-theme-load-path
+                           (list package-dir 'custom-theme-directory t)))))
+      (delete-directory package-dir t))))
 
 (provide 'ivory-themes-tests)
 
