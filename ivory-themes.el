@@ -34,7 +34,10 @@ top-level headings 1-3 stay bold regardless."
   :group 'ivory-themes)
 
 (defcustom ivory-themes-italic-constructs nil
-  "When non-nil, allow italic text in faces that conventionally use it."
+  "When non-nil, allow italic text in faces that conventionally use it.
+
+When nil, slant is also removed from the base `italic' and `bold-italic'
+faces, so Org and Markdown italic emphasis stays upright."
   :type 'boolean
   :group 'ivory-themes)
 
