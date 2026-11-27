@@ -788,6 +788,51 @@ Regression test for the apply-then-enable order in `ivory-themes-load'."
         (disable-theme 'ivory-dark))
       (put 'ivory-dark 'theme-settings nil))))
 
+(ert-deftest ivory-themes-test-pdf-view-midnight-colors-quoted ()
+  "Theme variable `pdf-view-midnight-colors' evaluates cleanly in both load orders."
+  (let* ((theme-dir (file-name-directory (locate-library "ivory-themes")))
+         (var 'pdf-view-midnight-colors)
+         (was-bound (boundp var))
+         (old-val (and was-bound (symbol-value var)))
+         (old-plist (copy-sequence (symbol-plist var)))
+         (old-faces-group (copy-sequence (get 'faces 'custom-group)))
+         (ivory-themes-soft-backgrounds nil)
+         (ivory-themes-common-palette-overrides nil)
+         (ivory-themes-light-palette-overrides nil)
+         (ivory-themes-dark-palette-overrides nil))
+    (unwind-protect
+        (let ((custom-theme-load-path (cons theme-dir custom-theme-load-path)))
+          ;; Order 1: variable defined before loading theme.
+          (ivory-themes-test--reset-light-theme)
+          (makunbound var)
+          (setplist var nil)
+          (custom-declare-variable
+           var ''("#839496" . "#002b36")
+           "Mock `pdf-view-midnight-colors' for testing."
+           :type '(cons string string)
+           :group 'faces)
+          (load-theme 'ivory-light t)
+          (should (equal (symbol-value var) '("#111111" . "#ffffff")))
+          (disable-theme 'ivory-light)
+          (should (equal (symbol-value var) '("#839496" . "#002b36")))
+          ;; Order 2: theme loaded before variable is declared.
+          (ivory-themes-test--reset-light-theme)
+          (makunbound var)
+          (setplist var nil)
+          (load-theme 'ivory-light t)
+          (custom-declare-variable
+           var ''("#839496" . "#002b36")
+           "Mock `pdf-view-midnight-colors' for testing."
+           :type '(cons string string)
+           :group 'faces)
+          (should (equal (symbol-value var) '("#111111" . "#ffffff"))))
+      (ivory-themes-test--reset-light-theme)
+      (setplist var old-plist)
+      (put 'faces 'custom-group old-faces-group)
+      (if was-bound
+          (set var old-val)
+        (makunbound var)))))
+
 (provide 'ivory-themes-tests)
 
 ;;; ivory-themes-tests.el ends here

@@ -1117,7 +1117,7 @@ branch state, remain explicit hex colors."))
 (defun ivory-themes--variables (palette)
   "Return theme variable specs for PALETTE."
   (ivory-themes--with-colors palette
-    `((pdf-view-midnight-colors (,fg . ,bg)))))
+    `((pdf-view-midnight-colors '(,fg . ,bg)))))
 
 (defun ivory-themes--variant (theme)
   "Return the palette variant for THEME."
