@@ -85,6 +85,25 @@ keeps integration tests independent of one another."
         (should (equal internal-border
                        `(internal-border ((t (:background ,bg))))))))))
 
+(ert-deftest ivory-themes-test-widget-and-tab-line-alternate-faces-themed ()
+  "Widget fields and alternate inactive tab-line tabs use Ivory roles."
+  (dolist (variant '(light dark))
+    (let* ((palette (ivory-themes--palette variant))
+           (basic (ivory-themes--faces-basic palette))
+           (misc (ivory-themes--faces-misc palette))
+           (alt-tab (ivory-themes-test--face-attributes
+                     'tab-line-tab-inactive-alternate basic)))
+      (should (equal (plist-get alt-tab :background)
+                     (alist-get 'bg-dim palette)))
+      (should (equal (plist-get alt-tab :foreground)
+                     (alist-get 'fg-dim palette)))
+      (dolist (face '(widget-field widget-single-line-field))
+        (let ((attrs (ivory-themes-test--face-attributes face misc)))
+          (should (equal (plist-get attrs :background)
+                         (alist-get 'bg-alt palette)))
+          (should (equal (plist-get attrs :foreground)
+                         (alist-get 'fg palette))))))))
+
 (ert-deftest ivory-themes-test-solaire-remapped-faces-follow-base-surface ()
   "Solaire buffers should not reveal contrasting frame padding."
   (let ((ivory-themes-soft-backgrounds t))
