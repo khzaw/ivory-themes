@@ -1,17 +1,18 @@
-# Ivory Themes
+# Ivory themes
 
-Ivory is a minimal, near-monochromatic Emacs theme package with two variants:
+Ivory is a minimal, near-monochrome Emacs theme package with two variants:
 
 - `ivory-light`
 - `ivory-dark`
 
-Most syntax contrast comes from weight, foreground intensity, and background
-surfaces.  Git and diff faces keep red/green directionality by default.
-Magit branch labels use blue backgrounds for local branches and violet for
-remote branches; the current branch has a green background and border.
+Most syntax contrast comes from font weight, foreground gray level, and
+background shade.  Git and diff faces use red for removals and green for
+additions.  Magit labels local branches with a blue background and remote
+branches with a violet one.  The current branch has a green background and
+border.
 
 ## Installation
-### `use-package` With `:vc`
+### `use-package` with `:vc`
 
 ```elisp
 (use-package ivory-themes
@@ -56,42 +57,43 @@ remote branches; the current branch has a green background and border.
 
 ## Options
 
-Set options before loading or reloading a theme.
+Set options before you load or reload a theme.
 
 ```elisp
-(setq ivory-themes-bold-constructs t      ; bold for syntax/content emphasis
-      ivory-themes-italic-constructs nil  ; italics where conventional
-      ivory-themes-soft-backgrounds nil)  ; pure white/black editor backgrounds
+(setq ivory-themes-bold-constructs t      ; bold syntax and content emphasis
+      ivory-themes-italic-constructs nil  ; italics off
+      ivory-themes-soft-backgrounds nil)  ; pure white or black editor background
 ```
 
 | Option | Default | Effect |
 | --- | --- | --- |
-| `ivory-themes-bold-constructs` | `t` | Bold weight for syntax/content emphasis; modelines, completion match text, Magit, diagnostics, and top-level headings stay bold regardless. |
-| `ivory-themes-italic-constructs` | `nil` | Allow italics in faces that conventionally use them (when `nil`, base `italic` and `bold-italic` faces stay upright too). |
-| `ivory-themes-soft-backgrounds` | `nil` | Replace the pure white/black editor background with a slightly softened one. |
+| `ivory-themes-bold-constructs` | `t` | Use bold for syntax and content emphasis.  Modelines, completion matches, Magit, diagnostics, and top-level headings stay bold either way. |
+| `ivory-themes-italic-constructs` | `nil` | Allow italics in faces that usually use them.  When `nil`, the base `italic` and `bold-italic` faces are upright too, so Org and Markdown emphasis is upright. |
+| `ivory-themes-soft-backgrounds` | `nil` | Use `#f8f8f8` instead of white in `ivory-light` and `#080808` instead of black in `ivory-dark`. |
 
-Completion selections use background shading; matches retain bold emphasis.
-Symbol overlays use gray backgrounds, with underlines distinguishing overlays
-that share a shade.
+Completion selections use a shaded background, and matched characters stay
+bold.  Symbol overlays use gray backgrounds.  Overlays that reuse a gray also
+get an underline.
 
-Dark syntax uses separate gray tiers for definitions, calls, and types.
-Definitions and types retain optional bold emphasis, while calls and builtins
-stay regular-weight.  Eglot leaves calls and assignments at their underlying
-font-lock weight rather than making them all bold.  Light syntax is unchanged.
+In `ivory-dark`, definitions, calls, and types each have their own gray.
+Definitions and types are bold when `ivory-themes-bold-constructs` is on.
+Calls and builtins are always regular weight.  Eglot's semantic faces for
+calls and assignments keep the font-lock weight instead of turning bold.
+`ivory-light` uses one gray for definitions, calls, and types.
 
 ### Softened backgrounds
 
-By default `ivory-light` uses pure white and `ivory-dark` uses pure black for
-the editor background.  Enable `ivory-themes-soft-backgrounds` to take the edge
-off that contrast — `ivory-light` shifts to `#f8f8f8` and `ivory-dark` to
-`#080808`, along with matching adjustments to adjacent surfaces.
+By default `ivory-light` uses a pure white editor background and `ivory-dark`
+uses pure black.  Set `ivory-themes-soft-backgrounds` to `t` to use `#f8f8f8`
+in `ivory-light` and `#080808` in `ivory-dark`.  `bg-alt`, `bg-subtle`, and
+`bg-modeline-inactive` shift with it so they stay distinct from `bg`.
 
 ```elisp
 (setq ivory-themes-soft-backgrounds t)
 (ivory-themes-load 'ivory-light)
 ```
 
-You can also flip it without restarting Emacs:
+To toggle it without restarting Emacs:
 
 ```elisp
 (ivory-themes-toggle-soft-backgrounds)
@@ -103,49 +105,41 @@ You can also flip it without restarting Emacs:
 (ivory-themes-toggle)
 ```
 
-## Palette System
+## Palette system
 
-Ivory is a near-monochromatic theme, so nearly every color is a shade of gray.
-The idea behind the grayscale is to describe each of those grays with a single
-number instead of a hex code.
+Almost every color in Ivory is a gray, and the palette source writes each gray
+as one number instead of a hex code.
 
-A color has three channels: red, green, and blue. Each one goes from 0 to 255.
-When all three are equal, you get a gray, so one number is enough to define it.
-That number is the rung on the ladder. `(gray 0)` is black, `#000000`.
-`(gray 255)` is white, `#ffffff`. `(gray 138)` sits in the middle at `#8a8a8a`.
+A color has red, green, and blue channels, each from 0 to 255.  When all three
+are equal, the color is a gray, so one number defines it.  `(gray 0)` is black,
+`#000000`.  `(gray 255)` is white, `#ffffff`.  `(gray 138)` is `#8a8a8a`.  A
+higher number is a lighter gray, so `(gray 146)` is a little lighter than
+`(gray 138)`.
 
-So most colors are just a name pointing at one rung on the ladder. The palette
-source writes them as `(gray N)` instead of hex. To make a color lighter, you
-raise the number. `(gray 138)` to `(gray 146)` is one small step up.
+Colors that aren't gray, such as the red and green diff colors, are written as
+hex.
 
-A few colors aren't gray, like the red and green diff faces. Those are written
-as plain hex.
+In the default palette, the readable foreground roles have a contrast ratio of
+at least 3:1 against `bg`.  The main text color, `fg`, is about 18.9:1 in
+`ivory-light` and 18.1:1 in `ivory-dark`.  Comments, dimmed labels, completion
+annotations, and inactive UI text are closer to 3:1.  With soft backgrounds on,
+the faintest of these roles drop to about 2.9:1.
 
-In the default base palette, the main readable foreground roles target a
-contrast ratio of at least 3:1 against the base background.  Primary code text
-sits well above that target, while quieter text like comments, dimmed labels,
-completion annotations, and inactive UI text stays legible without shouting.
+### Background levels
 
-### Softened backgrounds
+By default `ivory-light` sets `bg` to `(gray 255)` and `ivory-dark` sets it to
+`(gray 0)`.  `bg-alt`, `bg-subtle`, and `bg-modeline-inactive` are 8 to 14
+gray levels away from `bg`, so they stay visible next to a pure white or black
+editor.
 
-By default the editor background sits right at the end of the ladder.
-`ivory-light` puts `bg` at `(gray 255)` and `ivory-dark` puts it at `(gray 0)`.
-The surfaces next to it keep a small gap from that base, so `bg-alt`,
-`bg-subtle`, and inactive modelines stay visible while the editor still reads
-as white or black.
+There are two ways to avoid a pure white or black background:
 
-If you'd rather not have a pure white or pure black background, you have two
-ways to soften it.
-
-- Turn on `ivory-themes-soft-backgrounds` (see [Options](#options)).  This
-  pulls `bg` just off the end of the ladder, to `#f8f8f8` for light and
-  `#080808` for dark, and moves the nearby surfaces to match.
-- Override the background roles yourself (see
-  [Palette Overrides](#palette-overrides)) if you want a particular tone.
-
-Either way you stay in the same role-based system.  You set roles like
-`fg-comment`, `bg-block`, or `modeline-accent`, and the grayscale notation
-behind the scenes just keeps the base palette consistent.
+- Turn on `ivory-themes-soft-backgrounds`, described under
+  [Options](#options).  It sets `bg` to `#f8f8f8` in `ivory-light` and
+  `#080808` in `ivory-dark`, and moves `bg-alt`, `bg-subtle`, and
+  `bg-modeline-inactive` with it.
+- Override `bg` and the other background roles with your own colors.  See
+  [Palette overrides](#palette-overrides).
 
 Palette roles:
 
@@ -160,14 +154,14 @@ Palette roles:
 | Diff backgrounds | `bg-added`, `bg-added-faint`, `bg-removed`, `bg-removed-faint`, `bg-changed`, `bg-changed-faint` |
 | Diff foregrounds | `fg-added`, `fg-added-intense`, `fg-removed`, `fg-removed-intense`, `fg-changed`, `fg-changed-intense` |
 
-## Palette Overrides
+## Palette overrides
 
-Palette entries can be overridden from user configuration before loading or
-reloading a theme.  The override names are the same symbols used in
-`ivory-themes-palettes`.  Override values must be six-digit `#rrggbb` hex
-colors.  Unknown role names signal an error instead of being ignored.
+You can override palette roles in your configuration before you load or
+reload a theme.  Override keys are the role names from `ivory-themes-palettes`.
+Override values must be six-digit `#rrggbb` hex colors.  An unknown role name
+signals an error.
 
-For example, tune light comments:
+For example, to change the light comment colors:
 
 ```elisp
 (setq ivory-themes-light-palette-overrides
@@ -177,7 +171,7 @@ For example, tune light comments:
 (ivory-themes-load 'ivory-light)
 ```
 
-Or make diff backgrounds stronger:
+To make the light diff backgrounds stronger:
 
 ```elisp
 (setq ivory-themes-light-palette-overrides
@@ -187,9 +181,10 @@ Or make diff backgrounds stronger:
 (ivory-themes-load 'ivory-light)
 ```
 
-Shared overrides go in `ivory-themes-common-palette-overrides`; variant-specific
-overrides go in `ivory-themes-light-palette-overrides` or
-`ivory-themes-dark-palette-overrides`.
+Put overrides for both variants in `ivory-themes-common-palette-overrides`.
+Put overrides for one variant in `ivory-themes-light-palette-overrides` or
+`ivory-themes-dark-palette-overrides`.  A variant override wins over a common
+override for the same role.
 
 ## Screenshots
 ### Light mode
@@ -224,13 +219,13 @@ overrides go in `ivory-themes-light-palette-overrides` or
 
 ![JavaScript](.github/screenshots/javascript-dark.png)
 
-#### Magit Status
+#### Magit status
 
-![Magit Status](.github/screenshots/magit-status-dark.png)
+![Magit status](.github/screenshots/magit-status-dark.png)
 
-#### Magit Log
+#### Magit log
 
-![Magit Log](.github/screenshots/magit-log-dark.png)
+![Magit log](.github/screenshots/magit-log-dark.png)
 
 #### Avy
 
@@ -239,4 +234,4 @@ overrides go in `ivory-themes-light-palette-overrides` or
 
 ## License
 
-Ivory Themes is licensed under the MIT License.  See [LICENSE](LICENSE).
+Ivory is licensed under the MIT License.  See [LICENSE](LICENSE).
