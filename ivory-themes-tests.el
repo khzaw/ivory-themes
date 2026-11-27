@@ -341,25 +341,80 @@ keeps integration tests independent of one another."
            (bg-code-block (alist-get 'bg-code-block palette))
            (bg-code-inline (alist-get 'bg-code-inline palette))
            (fg-alt (alist-get 'fg-alt palette)))
-      (dolist (face '(org-block markdown-code-face))
+      (dolist (face '(org-block markdown-code-face
+                      markdown-ts-code-block md-ts-code))
         (should (equal (plist-get (ivory-themes-test--face-attributes face faces)
                                   :background)
                        bg-code-block)))
-      (dolist (face '(markdown-ts-code-block md-ts-code))
-        (should (eq (plist-get (ivory-themes-test--face-attributes face faces)
-                               :inherit)
-                    'markdown-code-face)))
+      (should (eq (plist-get (ivory-themes-test--face-attributes
+                              'markdown-pre-face faces)
+                             :inherit)
+                  'markdown-code-face))
       (dolist (face '(org-code org-verbatim org-inline-src-block
-                      markdown-inline-code-face))
+                      markdown-inline-code-face markdown-ts-code-span
+                      md-ts-inline-code))
         (let ((attributes (ivory-themes-test--face-attributes face faces)))
           (should (equal (plist-get attributes :background) bg-code-inline))
           (should (equal (plist-get attributes :foreground) fg-alt))
           (should (equal (plist-get (plist-get attributes :box) :color)
-                         bg-code-inline))))
-      (dolist (face '(markdown-ts-code-span md-ts-inline-code))
-        (should (eq (plist-get (ivory-themes-test--face-attributes face faces)
-                               :inherit)
-                    'markdown-inline-code-face))))))
+                         bg-code-inline)))))))
+
+(ert-deftest ivory-themes-test-no-broken-cross-package-or-emacs29-inheritance ()
+  "Faces must not inherit from Emacs 29-only or sibling-package faces."
+  (let ((forbidden '(diff-added diff-changed diff-removed
+                     diff-refine-added diff-refine-changed diff-refine-removed
+                     font-lock-operator-face font-lock-property-name-face
+                     hl-line mode-line-active
+                     markdown-blockquote-face markdown-code-face
+                     markdown-gfm-checkbox-face markdown-header-face-1
+                     markdown-header-face-2 markdown-header-face-3
+                     markdown-header-face-4 markdown-header-face-5
+                     markdown-header-face-6 markdown-inline-code-face
+                     markdown-language-keyword-face markdown-list-face
+                     markdown-markup-face markdown-strike-through-face
+                     treemacs-directory-face treemacs-file-face
+                     treemacs-git-added-face treemacs-git-conflict-face
+                     treemacs-git-ignored-face treemacs-git-modified-face
+                     treemacs-root-face))
+        ;; Faces whose package defines or requires the parent face.
+        (same-package '((markdown-pre-face . markdown-code-face)
+                        (smerge-base . diff-changed)
+                        (smerge-lower . diff-added)
+                        (smerge-upper . diff-removed)
+                        (smerge-refined-added . diff-refine-added)
+                        (smerge-refined-removed . diff-refine-removed))))
+    (dolist (variant '(light dark))
+      (let ((faces (ivory-themes--all-faces (ivory-themes--palette variant) variant)))
+        (dolist (entry faces)
+          (let ((inherit (plist-get (cadr (car (cadr entry))) :inherit)))
+            (unless (eq inherit (alist-get (car entry) same-package))
+              (should-not (memq inherit forbidden)))))
+        (dolist (pair same-package)
+          (should (eq (plist-get (ivory-themes-test--face-attributes
+                                  (car pair) faces)
+                                 :inherit)
+                      (cdr pair))))
+        (dolist (level '(1 2 3 4 5 6))
+          (should (eq (plist-get (ivory-themes-test--face-attributes
+                                  (intern (format "markdown-header-face-%d" level))
+                                  faces)
+                                 :inherit)
+                      'markdown-header-face))))))
+  ;; Verify live `ediff' face resolution without requiring `diff-mode'.
+  (let ((theme-dir (file-name-directory (locate-library "ivory-themes")))
+        (ivory-themes-soft-backgrounds nil)
+        (ivory-themes-common-palette-overrides nil)
+        (ivory-themes-light-palette-overrides nil))
+    (unwind-protect
+        (let ((custom-theme-load-path (cons theme-dir custom-theme-load-path)))
+          (require 'ediff)
+          (ivory-themes-test--reset-light-theme)
+          (load-theme 'ivory-light t)
+          (should (equal (face-attribute 'ediff-current-diff-B :background nil t)
+                         "#d8f8e1"))
+          (should (equal (face-attribute 'ediff-fine-diff-A :background nil t)
+                         "#ffd8d5")))
+      (ivory-themes-test--reset-light-theme))))
 
 (ert-deftest ivory-themes-test-eglot-semantic-faces-follow-bold-option ()
   "Semantic emphasis follows the bold option without flattening dark syntax."
