@@ -1123,12 +1123,16 @@ branch state, remain explicit hex colors."))
     ('ivory-dark 'dark)
     (_ (error "Unknown Ivory theme: %s" theme))))
 
+(defun ivory-themes--active-theme ()
+  "Return the highest-precedence enabled Ivory theme, or nil."
+  (catch 'found
+    (dolist (theme custom-enabled-themes)
+      (when (memq theme '(ivory-light ivory-dark))
+        (throw 'found theme)))))
+
 (defun ivory-themes--current-theme ()
   "Return the currently enabled Ivory theme, or `ivory-light'."
-  (cond
-   ((memq 'ivory-dark custom-enabled-themes) 'ivory-dark)
-   ((memq 'ivory-light custom-enabled-themes) 'ivory-light)
-   (t 'ivory-light)))
+  (or (ivory-themes--active-theme) 'ivory-light))
 
 ;;;###autoload
 (defun ivory-themes-load (theme)
@@ -1150,7 +1154,7 @@ branch state, remain explicit hex colors."))
   "Toggle between `ivory-light' and `ivory-dark'."
   (interactive)
   (ivory-themes-load
-   (if (memq 'ivory-light custom-enabled-themes)
+   (if (eq (ivory-themes--active-theme) 'ivory-light)
        'ivory-dark
      'ivory-light)))
 

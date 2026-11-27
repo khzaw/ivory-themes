@@ -723,6 +723,37 @@ Regression test for the apply-then-enable order in `ivory-themes-load'."
       (when (memq 'ivory-dark custom-enabled-themes)
         (disable-theme 'ivory-dark)))))
 
+(ert-deftest ivory-themes-test-stacked-theme-precedence ()
+  "Active theme detection and toggling respect `custom-enabled-themes' order."
+  (let ((theme-dir (file-name-directory (locate-library "ivory-themes")))
+        (ivory-themes-soft-backgrounds nil)
+        (ivory-themes-common-palette-overrides nil)
+        (ivory-themes-light-palette-overrides nil)
+        (ivory-themes-dark-palette-overrides nil))
+    (unwind-protect
+        (let ((custom-theme-load-path (cons theme-dir custom-theme-load-path)))
+          (ivory-themes-test--reset-light-theme)
+          (when (memq 'ivory-dark custom-enabled-themes)
+            (disable-theme 'ivory-dark))
+          (put 'ivory-dark 'theme-settings nil)
+          ;; Dark loaded first, then light stacked on top: light is active.
+          (load-theme 'ivory-dark t)
+          (load-theme 'ivory-light t)
+          (should (eq (ivory-themes--current-theme) 'ivory-light))
+          (ivory-themes-toggle)
+          (should (equal custom-enabled-themes '(ivory-dark)))
+          ;; Light loaded first, then dark stacked on top: dark is active.
+          (disable-theme 'ivory-dark)
+          (load-theme 'ivory-light t)
+          (load-theme 'ivory-dark t)
+          (should (eq (ivory-themes--current-theme) 'ivory-dark))
+          (ivory-themes-toggle)
+          (should (equal custom-enabled-themes '(ivory-light))))
+      (ivory-themes-test--reset-light-theme)
+      (when (memq 'ivory-dark custom-enabled-themes)
+        (disable-theme 'ivory-dark))
+      (put 'ivory-dark 'theme-settings nil))))
+
 (ert-deftest ivory-themes-test-disabled-reload-refreshes-syntax ()
   "Reloading a disabled theme must not restore stale syntax settings."
   (require 'font-lock)
