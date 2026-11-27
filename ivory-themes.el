@@ -383,7 +383,7 @@ branch state, remain explicit hex colors."))
        (ivory-themes--face 'tab-line-tab `(:background ,bg :foreground ,fg :box (:line-width -1 :color ,border)))
        (ivory-themes--face 'tab-line-tab-current `(:background ,bg :foreground ,fg :weight bold :box (:line-width -1 :color ,border)))
        (ivory-themes--face 'tab-line-tab-inactive `(:background ,bg-alt :foreground ,fg-dim :box (:line-width -1 :color ,border)))
-       (ivory-themes--face 'tab-line-tab-inactive-alternate `(:background ,bg-dim :foreground ,fg-dim :box (:line-width -1 :color ,border)))))))
+       (ivory-themes--face 'tab-line-tab-inactive-alternate `(:background ,bg-code-inline :foreground ,fg-dim :box (:line-width -1 :color ,border)))))))
 
 (defun ivory-themes--faces-font-lock (palette variant)
   "Return font-lock and Tree-sitter faces for PALETTE and VARIANT."

@@ -94,7 +94,7 @@ keeps integration tests independent of one another."
            (alt-tab (ivory-themes-test--face-attributes
                      'tab-line-tab-inactive-alternate basic)))
       (should (equal (plist-get alt-tab :background)
-                     (alist-get 'bg-dim palette)))
+                     (alist-get 'bg-code-inline palette)))
       (should (equal (plist-get alt-tab :foreground)
                      (alist-get 'fg-dim palette)))
       (dolist (face '(widget-field widget-single-line-field))
@@ -103,6 +103,22 @@ keeps integration tests independent of one another."
                          (alist-get 'bg-alt palette)))
           (should (equal (plist-get attrs :foreground)
                          (alist-get 'fg palette))))))))
+
+(ert-deftest ivory-themes-test-tab-line-alternate-stands-out-from-inactive ()
+  "Alternating inactive tab-line tabs stay distinct in all background modes."
+  (dolist (soft '(nil t))
+    (let ((ivory-themes-soft-backgrounds soft))
+      (dolist (variant '(light dark))
+        (let* ((basic (ivory-themes--faces-basic
+                       (ivory-themes--palette variant)))
+               (inactive (ivory-themes-test--face-attributes
+                          'tab-line-tab-inactive basic))
+               (alternate (ivory-themes-test--face-attributes
+                           'tab-line-tab-inactive-alternate basic)))
+          (should (>= (ivory-themes-test--contrast-ratio
+                       (plist-get inactive :background)
+                       (plist-get alternate :background))
+                      1.05)))))))
 
 (ert-deftest ivory-themes-test-solaire-remapped-faces-follow-base-surface ()
   "Solaire buffers should not reveal contrasting frame padding."
