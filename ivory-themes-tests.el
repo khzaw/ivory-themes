@@ -709,6 +709,40 @@ was removed in favor of the ansi-color-* faces."
       (should (equal (plist-get spec :foreground)
                      (alist-get 'blue palette))))))
 
+(ert-deftest ivory-themes-test-vterm-and-ansi-bright-faces-remain-visible ()
+  "ANSI bright faces stay visible and vterm black backgrounds match editor bg."
+  (dolist (soft '(nil t))
+    (let ((ivory-themes-soft-backgrounds soft))
+      (dolist (variant '(light dark))
+        (let* ((palette (ivory-themes--palette variant))
+               (bg (alist-get 'bg palette))
+               (faces (ivory-themes--faces-files-buffers palette))
+               (vterm-black (ivory-themes-test--face-attributes
+                             'vterm-color-black faces)))
+          ;; Since vterm's separate bright faces (Sep 2023), the
+          ;; :background of `vterm-color-black' paints SGR 40, so it must
+          ;; blend into the editor background like `ansi-color-black'.
+          ;; Bright black comes from `vterm-color-bright-black', which
+          ;; inherits `term-color-bright-black' -> `ansi-color-bright-black'.
+          (should (equal (plist-get vterm-black :background) bg))
+          (should (equal (plist-get vterm-black :background)
+                         (plist-get (ivory-themes-test--face-attributes
+                                     'ansi-color-black faces)
+                                    :background)))
+          (dolist (face '(ansi-color-bright-black
+                          ansi-color-bright-red
+                          ansi-color-bright-green
+                          ansi-color-bright-yellow
+                          ansi-color-bright-blue
+                          ansi-color-bright-magenta
+                          ansi-color-bright-cyan
+                          ansi-color-bright-white))
+            (let ((spec (ivory-themes-test--face-attributes face faces)))
+              (should-not (equal (plist-get spec :foreground) bg))
+              (should (>= (ivory-themes-test--contrast-ratio
+                           (plist-get spec :foreground) bg)
+                          3.0)))))))))
+
 (ert-deftest ivory-themes-test-override-validation ()
   "Palette overrides reject unknown roles and invalid colors."
   (should (equal (ivory-themes--validate-palette-overrides
