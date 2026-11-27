@@ -17,6 +17,7 @@ remote branches; the current branch has a green background and border.
 (use-package ivory-themes
   :vc (:url "https://github.com/khzaw/ivory-themes.git"
        :rev :newest)
+  :demand t
   :custom
   (ivory-themes-bold-constructs t)
   (ivory-themes-italic-constructs nil)
@@ -31,6 +32,7 @@ remote branches; the current branch has a green background and border.
   :straight (:type git
              :host github
              :repo "khzaw/ivory-themes")
+  :demand t
   :custom
   (ivory-themes-bold-constructs t)
   (ivory-themes-italic-constructs nil)
@@ -44,6 +46,7 @@ remote branches; the current branch has a green background and border.
 (use-package ivory-themes
   :elpaca (:host github
            :repo "khzaw/ivory-themes")
+  :demand t
   :custom
   (ivory-themes-bold-constructs t)
   (ivory-themes-italic-constructs nil)
