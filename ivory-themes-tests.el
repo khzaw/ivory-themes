@@ -668,6 +668,36 @@ was removed in favor of the ansi-color-* faces."
     '((fg-comment . "not-a-color")) "test")
    :type 'user-error))
 
+(ert-deftest ivory-themes-test-load-preserves-active-theme-on-error ()
+  "Validation errors in `ivory-themes-load' must not disable active themes."
+  (let ((theme-dir (file-name-directory (locate-library "ivory-themes")))
+        (ivory-themes-soft-backgrounds nil)
+        (ivory-themes-common-palette-overrides nil)
+        (ivory-themes-light-palette-overrides nil)
+        (ivory-themes-dark-palette-overrides nil))
+    (unwind-protect
+        (let ((custom-theme-load-path (cons theme-dir custom-theme-load-path)))
+          (ivory-themes-test--reset-light-theme)
+          (when (memq 'ivory-dark custom-enabled-themes)
+            (disable-theme 'ivory-dark))
+          (put 'ivory-dark 'theme-settings nil)
+          (ivory-themes-load 'ivory-dark)
+          (should (equal custom-enabled-themes '(ivory-dark)))
+          (should (equal (face-background 'default) "#000000"))
+          ;; Invalid override on target theme must preserve `ivory-dark'.
+          (let ((ivory-themes-light-palette-overrides '((not-a-role . "#123456"))))
+            (should-error (ivory-themes-toggle) :type 'user-error)
+            (should (equal custom-enabled-themes '(ivory-dark)))
+            (should (equal (face-background 'default) "#000000")))
+          ;; Unknown theme symbol must signal error and preserve `ivory-dark'.
+          (should-error (ivory-themes-load 'modus-operandi) :type 'error)
+          (should (equal custom-enabled-themes '(ivory-dark)))
+          (should (equal (face-background 'default) "#000000")))
+      (ivory-themes-test--reset-light-theme)
+      (when (memq 'ivory-dark custom-enabled-themes)
+        (disable-theme 'ivory-dark))
+      (put 'ivory-dark 'theme-settings nil))))
+
 (ert-deftest ivory-themes-test-soft-background-toggle-affects-default-face ()
   "Toggling soft backgrounds reloads with a softened default face.
 Regression test for the apply-then-enable order in `ivory-themes-load'."
