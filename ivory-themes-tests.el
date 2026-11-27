@@ -764,6 +764,7 @@ Regression test for the apply-then-enable order in `ivory-themes-load'."
          (was-bound (boundp var))
          (old-val (and was-bound (symbol-value var)))
          (old-plist (copy-sequence (symbol-plist var)))
+         (old-faces-group (copy-sequence (get 'faces 'custom-group)))
          (ivory-themes-soft-backgrounds nil)
          (ivory-themes-common-palette-overrides nil)
          (ivory-themes-light-palette-overrides nil)
@@ -796,6 +797,7 @@ Regression test for the apply-then-enable order in `ivory-themes-load'."
           (should (equal (symbol-value var) '("#111111" . "#ffffff"))))
       (ivory-themes-test--reset-light-theme)
       (setplist var old-plist)
+      (put 'faces 'custom-group old-faces-group)
       (if was-bound
           (set var old-val)
         (makunbound var)))))
