@@ -1143,14 +1143,19 @@ branch state, remain explicit hex colors."))
   (interactive
    (list (intern (completing-read "Load Ivory theme: " '(ivory-light ivory-dark)
                                   nil t nil nil "ivory-light"))))
-  (dolist (enabled custom-enabled-themes)
-    (unless (eq enabled theme)
-      (disable-theme enabled)))
-  (if (memq theme custom-known-themes)
-      (progn
-        (ivory-themes--apply theme (ivory-themes--variant theme))
-        (enable-theme theme))
-    (load-theme theme t)))
+  (let ((variant (ivory-themes--variant theme))
+        (known (memq theme custom-known-themes)))
+    ;; Validate the palette and load the theme file before disabling
+    ;; active themes, so a failure leaves the current themes intact.
+    (ivory-themes--palette variant)
+    (unless known
+      (load-theme theme t t))
+    (dolist (enabled (copy-sequence custom-enabled-themes))
+      (unless (eq enabled theme)
+        (disable-theme enabled)))
+    (when known
+      (ivory-themes--apply theme variant))
+    (enable-theme theme)))
 
 ;;;###autoload
 (defun ivory-themes-toggle ()
