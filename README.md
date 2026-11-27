@@ -67,7 +67,7 @@ Set options before loading or reloading a theme.
 | Option | Default | Effect |
 | --- | --- | --- |
 | `ivory-themes-bold-constructs` | `t` | Bold weight for syntax/content emphasis; modelines, completion match text, Magit, diagnostics, and top-level headings stay bold regardless. |
-| `ivory-themes-italic-constructs` | `nil` | Allow italics in faces that conventionally use them. |
+| `ivory-themes-italic-constructs` | `nil` | Allow italics in faces that conventionally use them (when `nil`, base `italic` and `bold-italic` faces stay upright too). |
 | `ivory-themes-soft-backgrounds` | `nil` | Replace the pure white/black editor background with a slightly softened one. |
 
 Completion selections use background shading; matches retain bold emphasis.
@@ -121,11 +121,10 @@ raise the number. `(gray 138)` to `(gray 146)` is one small step up.
 A few colors aren't gray, like the red and green diff faces. Those are written
 as plain hex.
 
-The readable foreground roles are kept at a contrast ratio of at least 3:1
-against the background.  Primary code text sits well above that floor.  The 3:1
-target is really there for the quieter text like comments, dimmed labels,
-completion annotations, and inactive UI text, so those stay legible without
-shouting.
+In the default base palette, the main readable foreground roles target a
+contrast ratio of at least 3:1 against the base background.  Primary code text
+sits well above that target, while quieter text like comments, dimmed labels,
+completion annotations, and inactive UI text stays legible without shouting.
 
 ### Softened backgrounds
 

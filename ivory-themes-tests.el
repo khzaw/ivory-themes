@@ -342,25 +342,80 @@ keeps integration tests independent of one another."
            (bg-code-block (alist-get 'bg-code-block palette))
            (bg-code-inline (alist-get 'bg-code-inline palette))
            (fg-alt (alist-get 'fg-alt palette)))
-      (dolist (face '(org-block markdown-code-face))
+      (dolist (face '(org-block markdown-code-face
+                      markdown-ts-code-block md-ts-code))
         (should (equal (plist-get (ivory-themes-test--face-attributes face faces)
                                   :background)
                        bg-code-block)))
-      (dolist (face '(markdown-ts-code-block md-ts-code))
-        (should (eq (plist-get (ivory-themes-test--face-attributes face faces)
-                               :inherit)
-                    'markdown-code-face)))
+      (should (eq (plist-get (ivory-themes-test--face-attributes
+                              'markdown-pre-face faces)
+                             :inherit)
+                  'markdown-code-face))
       (dolist (face '(org-code org-verbatim org-inline-src-block
-                      markdown-inline-code-face))
+                      markdown-inline-code-face markdown-ts-code-span
+                      md-ts-inline-code))
         (let ((attributes (ivory-themes-test--face-attributes face faces)))
           (should (equal (plist-get attributes :background) bg-code-inline))
           (should (equal (plist-get attributes :foreground) fg-alt))
           (should (equal (plist-get (plist-get attributes :box) :color)
-                         bg-code-inline))))
-      (dolist (face '(markdown-ts-code-span md-ts-inline-code))
-        (should (eq (plist-get (ivory-themes-test--face-attributes face faces)
-                               :inherit)
-                    'markdown-inline-code-face))))))
+                         bg-code-inline)))))))
+
+(ert-deftest ivory-themes-test-no-broken-cross-package-or-emacs29-inheritance ()
+  "Faces must not inherit from Emacs 29-only or sibling-package faces."
+  (let ((forbidden '(diff-added diff-changed diff-removed
+                     diff-refine-added diff-refine-changed diff-refine-removed
+                     font-lock-operator-face font-lock-property-name-face
+                     hl-line mode-line-active
+                     markdown-blockquote-face markdown-code-face
+                     markdown-gfm-checkbox-face markdown-header-face-1
+                     markdown-header-face-2 markdown-header-face-3
+                     markdown-header-face-4 markdown-header-face-5
+                     markdown-header-face-6 markdown-inline-code-face
+                     markdown-language-keyword-face markdown-list-face
+                     markdown-markup-face markdown-strike-through-face
+                     treemacs-directory-face treemacs-file-face
+                     treemacs-git-added-face treemacs-git-conflict-face
+                     treemacs-git-ignored-face treemacs-git-modified-face
+                     treemacs-root-face))
+        ;; Faces whose package defines or requires the parent face.
+        (same-package '((markdown-pre-face . markdown-code-face)
+                        (smerge-base . diff-changed)
+                        (smerge-lower . diff-added)
+                        (smerge-upper . diff-removed)
+                        (smerge-refined-added . diff-refine-added)
+                        (smerge-refined-removed . diff-refine-removed))))
+    (dolist (variant '(light dark))
+      (let ((faces (ivory-themes--all-faces (ivory-themes--palette variant) variant)))
+        (dolist (entry faces)
+          (let ((inherit (plist-get (cadr (car (cadr entry))) :inherit)))
+            (unless (eq inherit (alist-get (car entry) same-package))
+              (should-not (memq inherit forbidden)))))
+        (dolist (pair same-package)
+          (should (eq (plist-get (ivory-themes-test--face-attributes
+                                  (car pair) faces)
+                                 :inherit)
+                      (cdr pair))))
+        (dolist (level '(1 2 3 4 5 6))
+          (should (eq (plist-get (ivory-themes-test--face-attributes
+                                  (intern (format "markdown-header-face-%d" level))
+                                  faces)
+                                 :inherit)
+                      'markdown-header-face))))))
+  ;; Verify live `ediff' face resolution without requiring `diff-mode'.
+  (let ((theme-dir (file-name-directory (locate-library "ivory-themes")))
+        (ivory-themes-soft-backgrounds nil)
+        (ivory-themes-common-palette-overrides nil)
+        (ivory-themes-light-palette-overrides nil))
+    (unwind-protect
+        (let ((custom-theme-load-path (cons theme-dir custom-theme-load-path)))
+          (require 'ediff)
+          (ivory-themes-test--reset-light-theme)
+          (load-theme 'ivory-light t)
+          (should (equal (face-attribute 'ediff-current-diff-B :background nil t)
+                         "#d8f8e1"))
+          (should (equal (face-attribute 'ediff-fine-diff-A :background nil t)
+                         "#ffd8d5")))
+      (ivory-themes-test--reset-light-theme))))
 
 (ert-deftest ivory-themes-test-eglot-semantic-faces-follow-bold-option ()
   "Semantic emphasis follows the bold option without flattening dark syntax."
@@ -669,6 +724,66 @@ was removed in favor of the ansi-color-* faces."
     '((fg-comment . "not-a-color")) "test")
    :type 'user-error))
 
+(ert-deftest ivory-themes-test-load-preserves-active-theme-on-error ()
+  "Validation errors in `ivory-themes-load' must not disable active themes."
+  (let ((theme-dir (file-name-directory (locate-library "ivory-themes")))
+        (ivory-themes-soft-backgrounds nil)
+        (ivory-themes-common-palette-overrides nil)
+        (ivory-themes-light-palette-overrides nil)
+        (ivory-themes-dark-palette-overrides nil))
+    (unwind-protect
+        (let ((custom-theme-load-path (cons theme-dir custom-theme-load-path)))
+          (ivory-themes-test--reset-light-theme)
+          (when (memq 'ivory-dark custom-enabled-themes)
+            (disable-theme 'ivory-dark))
+          (put 'ivory-dark 'theme-settings nil)
+          (ivory-themes-load 'ivory-dark)
+          (should (equal custom-enabled-themes '(ivory-dark)))
+          (should (equal (face-background 'default) "#000000"))
+          ;; Invalid override on target theme must preserve `ivory-dark'.
+          (let ((ivory-themes-light-palette-overrides '((not-a-role . "#123456"))))
+            (should-error (ivory-themes-toggle) :type 'user-error)
+            (should (equal custom-enabled-themes '(ivory-dark)))
+            (should (equal (face-background 'default) "#000000")))
+          ;; Unknown theme symbol must signal error and preserve `ivory-dark'.
+          (should-error (ivory-themes-load 'modus-operandi) :type 'error)
+          (should (equal custom-enabled-themes '(ivory-dark)))
+          (should (equal (face-background 'default) "#000000")))
+      (ivory-themes-test--reset-light-theme)
+      (dolist (theme '(ivory-dark modus-operandi))
+        (when (memq theme custom-enabled-themes)
+          (disable-theme theme)))
+      (put 'ivory-dark 'theme-settings nil))))
+
+(ert-deftest ivory-themes-test-load-preserves-active-theme-on-load-error ()
+  "A `load-theme' failure in `ivory-themes-load' must not disable themes."
+  (let ((theme-dir (file-name-directory (locate-library "ivory-themes")))
+        (empty-dir (make-temp-file "ivory-themes-test-" t))
+        (ivory-themes-soft-backgrounds nil)
+        (ivory-themes-common-palette-overrides nil)
+        (ivory-themes-light-palette-overrides nil)
+        (ivory-themes-dark-palette-overrides nil))
+    (unwind-protect
+        (progn
+          (ivory-themes-test--reset-light-theme)
+          (when (memq 'ivory-dark custom-enabled-themes)
+            (disable-theme 'ivory-dark))
+          (let ((custom-theme-load-path (cons theme-dir custom-theme-load-path)))
+            (ivory-themes-load 'ivory-light))
+          (should (equal custom-enabled-themes '(ivory-light)))
+          ;; Make `ivory-dark' unknown and its theme file unreachable so
+          ;; `load-theme' signals.  An empty directory is used because a
+          ;; nil path makes `locate-file' search `default-directory'.
+          (let ((custom-known-themes (remq 'ivory-dark custom-known-themes))
+                (custom-theme-load-path (list empty-dir)))
+            (should-error (ivory-themes-load 'ivory-dark) :type 'error)
+            (should (equal custom-enabled-themes '(ivory-light)))))
+      (delete-directory empty-dir)
+      (ivory-themes-test--reset-light-theme)
+      (when (memq 'ivory-dark custom-enabled-themes)
+        (disable-theme 'ivory-dark))
+      (put 'ivory-dark 'theme-settings nil))))
+
 (ert-deftest ivory-themes-test-soft-background-toggle-affects-default-face ()
   "Toggling soft backgrounds reloads with a softened default face.
 Regression test for the apply-then-enable order in `ivory-themes-load'."
@@ -724,6 +839,37 @@ Regression test for the apply-then-enable order in `ivory-themes-load'."
       (when (memq 'ivory-dark custom-enabled-themes)
         (disable-theme 'ivory-dark)))))
 
+(ert-deftest ivory-themes-test-stacked-theme-precedence ()
+  "Active theme detection and toggling respect `custom-enabled-themes' order."
+  (let ((theme-dir (file-name-directory (locate-library "ivory-themes")))
+        (ivory-themes-soft-backgrounds nil)
+        (ivory-themes-common-palette-overrides nil)
+        (ivory-themes-light-palette-overrides nil)
+        (ivory-themes-dark-palette-overrides nil))
+    (unwind-protect
+        (let ((custom-theme-load-path (cons theme-dir custom-theme-load-path)))
+          (ivory-themes-test--reset-light-theme)
+          (when (memq 'ivory-dark custom-enabled-themes)
+            (disable-theme 'ivory-dark))
+          (put 'ivory-dark 'theme-settings nil)
+          ;; Dark loaded first, then light stacked on top: light is active.
+          (load-theme 'ivory-dark t)
+          (load-theme 'ivory-light t)
+          (should (eq (ivory-themes--current-theme) 'ivory-light))
+          (ivory-themes-toggle)
+          (should (equal custom-enabled-themes '(ivory-dark)))
+          ;; Light loaded first, then dark stacked on top: dark is active.
+          (disable-theme 'ivory-dark)
+          (load-theme 'ivory-light t)
+          (load-theme 'ivory-dark t)
+          (should (eq (ivory-themes--current-theme) 'ivory-dark))
+          (ivory-themes-toggle)
+          (should (equal custom-enabled-themes '(ivory-light))))
+      (ivory-themes-test--reset-light-theme)
+      (when (memq 'ivory-dark custom-enabled-themes)
+        (disable-theme 'ivory-dark))
+      (put 'ivory-dark 'theme-settings nil))))
+
 (ert-deftest ivory-themes-test-disabled-reload-refreshes-syntax ()
   "Reloading a disabled theme must not restore stale syntax settings."
   (require 'font-lock)
@@ -773,6 +919,51 @@ Regression test for the apply-then-enable order in `ivory-themes-load'."
             (should (equal custom-theme-load-path
                            (list package-dir 'custom-theme-directory t)))))
       (delete-directory package-dir t))))
+
+(ert-deftest ivory-themes-test-pdf-view-midnight-colors-quoted ()
+  "Theme variable `pdf-view-midnight-colors' evaluates cleanly in both load orders."
+  (let* ((theme-dir (file-name-directory (locate-library "ivory-themes")))
+         (var 'pdf-view-midnight-colors)
+         (was-bound (boundp var))
+         (old-val (and was-bound (symbol-value var)))
+         (old-plist (copy-sequence (symbol-plist var)))
+         (old-faces-group (copy-sequence (get 'faces 'custom-group)))
+         (ivory-themes-soft-backgrounds nil)
+         (ivory-themes-common-palette-overrides nil)
+         (ivory-themes-light-palette-overrides nil)
+         (ivory-themes-dark-palette-overrides nil))
+    (unwind-protect
+        (let ((custom-theme-load-path (cons theme-dir custom-theme-load-path)))
+          ;; Order 1: variable defined before loading theme.
+          (ivory-themes-test--reset-light-theme)
+          (makunbound var)
+          (setplist var nil)
+          (custom-declare-variable
+           var ''("#839496" . "#002b36")
+           "Mock `pdf-view-midnight-colors' for testing."
+           :type '(cons string string)
+           :group 'faces)
+          (load-theme 'ivory-light t)
+          (should (equal (symbol-value var) '("#111111" . "#ffffff")))
+          (disable-theme 'ivory-light)
+          (should (equal (symbol-value var) '("#839496" . "#002b36")))
+          ;; Order 2: theme loaded before variable is declared.
+          (ivory-themes-test--reset-light-theme)
+          (makunbound var)
+          (setplist var nil)
+          (load-theme 'ivory-light t)
+          (custom-declare-variable
+           var ''("#839496" . "#002b36")
+           "Mock `pdf-view-midnight-colors' for testing."
+           :type '(cons string string)
+           :group 'faces)
+          (should (equal (symbol-value var) '("#111111" . "#ffffff"))))
+      (ivory-themes-test--reset-light-theme)
+      (setplist var old-plist)
+      (put 'faces 'custom-group old-faces-group)
+      (if was-bound
+          (set var old-val)
+        (makunbound var)))))
 
 (provide 'ivory-themes-tests)
 
